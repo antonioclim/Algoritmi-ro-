@@ -1,0 +1,5 @@
+1001 Popescu Ion 2023 1050 8 9 7 10 8 9 7 8 9 10
+1002 Ionescu Maria 2023 1051 10 10 9 10 10 9 10 10 9 10
+1003 Georgescu Andrei 2023 1050 5 6 4 5 6 7 5 6 4 5
+1004 Dumitrescu Ana 2023 1051 7 8 7 8 7 8 7 8 7 8
+1005 Stanescu Mihai 2023 1050 3 4 5 3 4 5 3 4 5 3

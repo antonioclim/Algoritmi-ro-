@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Săptămâna 03: Fișiere Binare | ATP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s ease; z-index: 1000;
+        }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 60px 80px; display: none; opacity: 0;
+            transition: opacity 0.4s ease; overflow-y: auto;
+        }
+        .slide.active { display: flex; flex-direction: column; opacity: 1; }
+        .slide.title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+        }
+        h1 {
+            font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            font-size: 2.2rem; font-weight: 600; margin-bottom: 1.5rem;
+            color: var(--accent-blue); border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        h3 { font-size: 1.5rem; font-weight: 600; margin: 1rem 0; color: var(--accent-green); }
+        p { font-size: 1.2rem; margin-bottom: 1rem; }
+        .subtitle { font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .meta { font-size: 1rem; color: var(--text-secondary); margin-top: 2rem; }
+        ul, ol { margin: 1rem 0 1rem 2rem; font-size: 1.1rem; }
+        li { margin-bottom: 0.5rem; }
+        li::marker { color: var(--accent-blue); }
+        .code-block {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            border-radius: 8px; margin: 1rem 0; overflow: hidden;
+        }
+        .code-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.5rem 1rem; background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        .lang-badge {
+            background: var(--accent-blue); color: var(--bg-primary);
+            padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem;
+        }
+        pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        code { font-family: 'Fira Code', Consolas, monospace; font-size: 0.95rem; }
+        .info-box {
+            padding: 1rem 1.5rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid;
+        }
+        .info-box.tip { background: rgba(63, 185, 80, 0.1); border-color: var(--accent-green); }
+        .info-box.warning { background: rgba(210, 153, 34, 0.1); border-color: var(--accent-yellow); }
+        .info-box.error { background: rgba(248, 81, 73, 0.1); border-color: var(--accent-red); }
+        .info-box.note { background: rgba(88, 166, 255, 0.1); border-color: var(--accent-blue); }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1rem 0; }
+        .column {
+            background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .ascii-diagram {
+            background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px;
+            font-family: monospace; white-space: pre; font-size: 0.9rem;
+            overflow-x: auto; border: 1px solid var(--border-color); color: var(--accent-green);
+        }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 1rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-tertiary); color: var(--accent-blue); font-weight: 600; }
+        tr:nth-child(even) { background: var(--bg-secondary); }
+        blockquote {
+            border-left: 4px solid var(--accent-purple); padding: 1rem 1.5rem;
+            margin: 1rem 0; background: var(--bg-secondary); border-radius: 0 8px 8px 0;
+            font-style: italic; color: var(--text-secondary);
+        }
+        blockquote cite { display: block; margin-top: 0.5rem; color: var(--accent-purple); font-style: normal; }
+        .nav-container { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .nav-btn {
+            width: 50px; height: 50px; border: none; border-radius: 50%;
+            background: var(--bg-secondary); color: var(--text-primary);
+            font-size: 1.2rem; cursor: pointer; transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+        .slide-counter {
+            position: fixed; bottom: 20px; left: 20px; font-size: 1rem;
+            color: var(--text-secondary); background: var(--bg-secondary);
+            padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color);
+        }
+        .figure-card {
+            display: flex; gap: 2rem; background: var(--bg-secondary);
+            padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 1rem 0;
+        }
+        .figure-image {
+            width: 150px; height: 150px; background: var(--bg-tertiary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 4rem; flex-shrink: 0;
+        }
+        .figure-info h3 { color: var(--accent-blue); margin-bottom: 0.5rem; }
+        .figure-info p { font-size: 1rem; color: var(--text-secondary); }
+        .summary-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+        .summary-item {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid var(--border-color);
+        }
+        .summary-item .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .summary-item h4 { color: var(--accent-blue); margin-bottom: 0.5rem; }
+        kbd {
+            background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px;
+            border: 1px solid var(--border-color); font-family: monospace; font-size: 0.9rem;
+        }
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; }
+            .two-columns, .summary-box { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slides-container" id="slidesContainer">
+        
+        <div class="slide title-slide active" data-slide="1">
+            <h1>Fișiere Binare în C</h1>
+            <p class="subtitle">Săptămâna 03 - Algoritmi și Tehnici de Programare</p>
+            <p class="meta">Academia de Studii Economice București<br>Catedra de Informatică Economică</p>
+            <p style="margin-top: 3rem; color: var(--text-secondary);">
+                Navigare: <kbd>←</kbd> <kbd>→</kbd> sau <kbd>Space</kbd>
+            </p>
+        </div>
+
+        <div class="slide content-slide" data-slide="2">
+            <h2>🎯 Obiective de Învățare</h2>
+            <ul>
+                <li><strong>Identificați</strong> diferențele dintre fișierele text și binare</li>
+                <li><strong>Explicați</strong> funcțiile fread(), fwrite(), fseek(), ftell()</li>
+                <li><strong>Aplicați</strong> tehnici de serializare pentru structuri complexe</li>
+                <li><strong>Analizați</strong> implicațiile endianness și padding</li>
+                <li><strong>Evaluați</strong> compromisurile text vs. binar</li>
+                <li><strong>Creați</strong> sisteme de persistență cu operații CRUD</li>
+            </ul>
+            <div class="info-box tip">
+                <strong>💡 Sugestie:</strong> Obiectivele urmează taxonomia lui Bloom!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="3">
+            <h2>📜 Context Istoric</h2>
+            <div class="ascii-diagram">
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    EVOLUȚIA FORMATULUI BINAR                                │
+├────────────────────────────────────────────────────────────────────────────┤
+│  1950s         1972           1983           1990s          2000s+         │
+│    │             │              │              │              │             │
+│    ▼             ▼              ▼              ▼              ▼             │
+│  Primele      Limbajul C     Standard      Formate       Formate          │
+│  computere    @ Bell Labs    ANSI C        multimedia    moderne          │
+│  (carduri)    (fread/fwrite) (stdio.h)     (BMP, WAV)    (protobuf)      │
+└────────────────────────────────────────────────────────────────────────────┘
+            </div>
+            <p>Fișierele binare au apărut când memoria era scumpă. Rămân esențiale pentru: OS, multimedia, rețele și DB.</p>
+        </div>
+
+        <div class="slide content-slide" data-slide="4">
+            <h2>👤 Dennis Ritchie (1941-2011)</h2>
+            <div class="figure-card">
+                <div class="figure-image">👨‍💻</div>
+                <div class="figure-info">
+                    <h3>Creatorul limbajului C</h3>
+                    <p>Co-dezvoltator UNIX la Bell Labs. Premiul Turing 1983. Contribuțiile sale la I/O streams au fundamentat programarea modernă.</p>
+                </div>
+            </div>
+            <blockquote>
+                "UNIX este simplu. Trebuie doar să fii un geniu ca să-i înțelegi simplitatea."
+                <cite>— Dennis Ritchie</cite>
+            </blockquote>
+        </div>
+
+        <div class="slide content-slide" data-slide="5">
+            <h2>📁 Text vs. Binar</h2>
+            <div class="two-columns">
+                <div class="column">
+                    <h3 style="color: var(--accent-yellow);">📄 Fișiere Text</h3>
+                    <ul>
+                        <li>Caractere printabile</li>
+                        <li>Human-readable</li>
+                        <li>Portabile</li>
+                        <li>Necesită conversii</li>
+                        <li>Dimensiune mai mare</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3 style="color: var(--accent-green);">💾 Fișiere Binare</h3>
+                    <ul>
+                        <li>Bytes arbitrari</li>
+                        <li>Nu sunt citibile</li>
+                        <li>Atenție portabilitate</li>
+                        <li>Transfer direct memorie</li>
+                        <li>Compacte și rapide</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="6">
+            <h2>🔍 Reprezentarea 12345</h2>
+            <div class="ascii-diagram">
+TEXT (ASCII):     '1'   '2'   '3'   '4'   '5'  = 5 bytes
+                  0x31  0x32  0x33  0x34  0x35
+
+BINAR (int32):    0x39  0x30  0x00  0x00       = 4 bytes
+                  (little-endian: LSB primul)
+
+Economie: 20% pentru acest exemplu, mai mult pentru numere mari!
+            </div>
+            <div class="info-box note">
+                <strong>📝 Notă:</strong> Little-endian = LSB primul (Intel/AMD).
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="7">
+            <h2>📂 Deschiderea Fișierelor</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Moduri binare</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">FILE *f;
+f = fopen("date.bin", "rb");     // read binary
+f = fopen("date.bin", "wb");     // write binary (nou)
+f = fopen("date.bin", "rb+");    // read/write (există)
+f = fopen("date.bin", "wb+");    // read/write (nou)
+f = fopen("date.bin", "ab");     // append binary</code></pre>
+            </div>
+            <div class="info-box warning">
+                <strong>⚠️</strong> Sufixul "b" e obligatoriu pe Windows!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="8">
+            <h2>✍️ fwrite()</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Scriere date binare</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">size_t fwrite(const void *ptr, size_t size, 
+              size_t count, FILE *stream);
+// Returnează: numărul de elemente scrise
+
+int numar = 42;
+fwrite(&numar, sizeof(int), 1, f);     // 1 int
+
+int arr[10] = {1,2,3,4,5,6,7,8,9,10};
+fwrite(arr, sizeof(int), 10, f);       // 10 int-uri
+
+Student s = {"Popescu", 9.5};
+fwrite(&s, sizeof(Student), 1, f);     // structură</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="9">
+            <h2>📖 fread()</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Citire date binare</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">size_t fread(void *ptr, size_t size,
+             size_t count, FILE *stream);
+// Returnează: numărul de elemente citite
+
+int numar;
+size_t citite = fread(&numar, sizeof(int), 1, f);
+if (citite != 1) {
+    // EOF sau eroare!
+}
+
+Student s;
+fread(&s, sizeof(Student), 1, f);</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="10">
+            <h2>🎯 fseek()</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Poziționare în fișier</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">int fseek(FILE *stream, long offset, int whence);
+// Returnează: 0 succes, non-zero eroare
+
+fseek(f, 0, SEEK_SET);      // la început
+fseek(f, 100, SEEK_SET);    // byte 100
+fseek(f, -10, SEEK_CUR);    // 10 bytes înapoi
+fseek(f, 0, SEEK_END);      // la sfârșit
+fseek(f, -sizeof(Record), SEEK_END); // ultima înreg.</code></pre>
+            </div>
+            <div class="info-box tip">
+                <strong>💡</strong> Random Access: O(1)!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="11">
+            <h2>📍 ftell()</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Obținere poziție</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">long ftell(FILE *stream);
+// Returnează: poziția curentă sau -1L eroare
+
+// Pattern: dimensiune fișier
+fseek(f, 0, SEEK_END);
+long size = ftell(f);
+fseek(f, 0, SEEK_SET);  // revino la început
+
+printf("Dimensiune: %ld bytes\n", size);
+printf("Înregistrări: %ld\n", size / sizeof(Record));</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="12">
+            <h2>⚡ Acces Direct</h2>
+            <div class="ascii-diagram">
+STRUCTURA FIȘIERULUI:
+┌────────┬──────────┬──────────┬──────────┬──────────┐
+│ Header │Record #0 │Record #1 │Record #2 │   ...    │
+└────────┴──────────┴──────────┴──────────┴──────────┘
+
+Citire Record #N:
+offset = sizeof(Header) + N * sizeof(Record);
+fseek(f, offset, SEEK_SET);
+fread(&record, sizeof(Record), 1, f);
+
+Complexitate: O(1) vs O(n) pentru text!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="13">
+            <h2>🏗️ Serializare Structuri</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Scriere/citire structuri</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">typedef struct {
+    uint32_t id;
+    char nume[50];
+    float medie;
+    uint8_t activ;
+} Student;
+
+// Scriere
+Student s = {1001, "Popescu Ion", 9.5f, 1};
+fwrite(&s, sizeof(Student), 1, f);
+
+// Citire
+Student s_citit;
+fread(&s_citit, sizeof(Student), 1, f);</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="14">
+            <h2>⚠️ Padding</h2>
+            <div class="ascii-diagram">
+struct Normal {         Layout fără pack:
+    char a;      →     [a][P][P][P][  b  ] = 8 bytes
+    int b;                          
+};                     
+
+#pragma pack(push, 1)
+struct Packed {        Layout cu pack:
+    char a;      →     [a][  b  ] = 5 bytes
+    int b;              
+};
+#pragma pack(pop)
+            </div>
+            <div class="info-box warning">
+                <strong>⚠️</strong> Folosiți #pragma pack pentru portabilitate!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="15">
+            <h2>🔄 Endianness</h2>
+            <div class="two-columns">
+                <div class="column">
+                    <h3 style="color: var(--accent-blue);">Little-Endian</h3>
+                    <p>LSB primul</p>
+                    <div class="ascii-diagram" style="font-size: 0.85rem;">
+0x12345678:
+[78][56][34][12]
+                    </div>
+                    <p>Intel, AMD, ARM</p>
+                </div>
+                <div class="column">
+                    <h3 style="color: var(--accent-yellow);">Big-Endian</h3>
+                    <p>MSB primul</p>
+                    <div class="ascii-diagram" style="font-size: 0.85rem;">
+0x12345678:
+[12][34][56][78]
+                    </div>
+                    <p>Network, SPARC</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="16">
+            <h2>🔍 Detectare Endianness</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Verificare și conversie</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">int is_little_endian(void) {
+    uint32_t test = 0x01020304;
+    uint8_t *first = (uint8_t *)&test;
+    return (*first == 0x04);
+}
+
+// Funcții conversie (arpa/inet.h)
+uint32_t htonl(uint32_t host);  // Host → Network
+uint32_t ntohl(uint32_t net);   // Network → Host
+uint16_t htons(uint16_t host);
+uint16_t ntohs(uint16_t net);</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="17">
+            <h2>📋 Design Header</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Header profesional</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">#pragma pack(push, 1)
+typedef struct {
+    uint32_t magic;         // "STUD" = 0x44555453
+    uint32_t version;       // Versiune format
+    uint32_t record_count;  // Nr înregistrări
+    uint32_t record_size;   // Dim înregistrare
+    uint64_t created_at;    // Timestamp creare
+    uint64_t modified_at;   // Timestamp modif
+    uint8_t  reserved[32];  // Extensii viitoare
+} FileHeader;
+#pragma pack(pop)</code></pre>
+            </div>
+            <div class="info-box note">
+                <strong>📝</strong> Magic number identifică unic formatul!
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="18">
+            <h2>🔄 Operații CRUD</h2>
+            <table>
+                <tr><th>Operație</th><th>Implementare</th></tr>
+                <tr><td>CREATE</td><td>fseek(END) + fwrite + update count</td></tr>
+                <tr><td>READ</td><td>fseek(offset) + fread</td></tr>
+                <tr><td>UPDATE</td><td>find offset + fseek + fwrite</td></tr>
+                <tr><td>DELETE</td><td>soft delete: record.deleted = 1</td></tr>
+            </table>
+        </div>
+
+        <div class="slide content-slide" data-slide="19">
+            <h2>🔍 Căutare Binară în Fișiere</h2>
+            <div class="code-block">
+                <div class="code-header"><span>O(log n) în fișier sortat</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">long binary_search(FILE *f, uint32_t count, uint32_t key) {
+    long left = 0, right = count - 1;
+    Record rec;
+    while (left <= right) {
+        long mid = (left + right) / 2;
+        long offset = sizeof(Header) + mid * sizeof(Record);
+        fseek(f, offset, SEEK_SET);
+        fread(&rec, sizeof(Record), 1, f);
+        if (rec.id == key) return offset;
+        else if (rec.id < key) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="20">
+            <h2>🖼️ Format BMP</h2>
+            <div class="ascii-diagram">
+STRUCTURA FIȘIER BMP:
+┌──────────────┬──────────────┬─────────────┬─────────────────┐
+│ File Header  │ Info Header  │   Paletă    │  Date Pixeli    │
+│  (14 bytes)  │  (40 bytes)  │ (opțional)  │                 │
+└──────────────┴──────────────┴─────────────┴─────────────────┘
+
+Pixeli (24-bit):
+- Stocați BGR, nu RGB!
+- Rânduri aliniate la 4 bytes
+- Bottom-up (de jos în sus)
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="21">
+            <h2>🖼️ Header-e BMP</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Structuri BMP</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">#pragma pack(push, 1)
+typedef struct {
+    uint16_t signature;     // "BM" = 0x4D42
+    uint32_t file_size;
+    uint16_t reserved1, reserved2;
+    uint32_t pixel_offset;
+} BMPFileHeader;  // 14 bytes
+
+typedef struct {
+    uint32_t header_size;   // 40
+    int32_t  width, height;
+    uint16_t planes;        // 1
+    uint16_t bits_per_pixel;// 24 pentru RGB
+    uint32_t compression;   // 0 = necomprimat
+    // ... alte câmpuri
+} BMPInfoHeader;  // 40 bytes
+#pragma pack(pop)</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="22">
+            <h2>📐 Padding Rânduri BMP</h2>
+            <div class="ascii-diagram">
+Imagine 3x2 pixeli, 24-bit:
+
+Rând: [Pixel0 BGR][Pixel1 BGR][Pixel2 BGR][PAD][PAD][PAD]
+       3 bytes    3 bytes     3 bytes      = 12 bytes total
+
+Formula: padding = (4 - (width * bytes_per_pixel) % 4) % 4
+Exemplu: (4 - (3 * 3) % 4) % 4 = 3 bytes padding
+            </div>
+            <div class="code-block">
+                <div class="code-header"><span>Calcul</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">int padding = (4 - (width * 3) % 4) % 4;
+int row_size = width * 3 + padding;</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="23">
+            <h2>⚠️ Gestionare Erori</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Tratare erori I/O</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">FILE *f = fopen("date.bin", "rb");
+if (f == NULL) {
+    perror("Eroare deschidere");
+    return -1;
+}
+
+size_t citite = fread(&data, sizeof(Data), 1, f);
+if (citite != 1) {
+    if (feof(f)) printf("EOF\n");
+    else if (ferror(f)) perror("Eroare citire");
+}
+
+fclose(f);  // Întotdeauna închideți!</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="24">
+            <h2>🔒 Siguranță Memorie</h2>
+            <div class="two-columns">
+                <div class="column">
+                    <h3 style="color: var(--accent-red);">❌ Greșit</h3>
+                    <ul>
+                        <li>fopen("f.bin", "r") fără "b"</li>
+                        <li>Neverificare return</li>
+                        <li>Scriere pointer nu date</li>
+                        <li>Ignorare padding</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3 style="color: var(--accent-green);">✓ Corect</h3>
+                    <ul>
+                        <li>Mod "rb" / "wb"</li>
+                        <li>Verificare fread/fwrite</li>
+                        <li>fwrite(ptr, sizeof(*ptr))</li>
+                        <li>#pragma pack</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="25">
+            <h2>🔧 Depanare</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Utilitare</span><span class="lang-badge">BASH</span></div>
+                <pre><code># Vizualizare hex
+hexdump -C fisier.bin | head -20
+xxd fisier.bin | head -20
+
+# Identificare tip
+file fisier.bin
+
+# Extrage strings
+strings fisier.bin
+
+# Valgrind
+valgrind --leak-check=full ./program</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="26">
+            <h2>⚡ Optimizări</h2>
+            <table>
+                <tr><th>Tehnică</th><th>Descriere</th><th>Câștig</th></tr>
+                <tr><td>Buffering</td><td>setvbuf() buffer mare</td><td>2-10x</td></tr>
+                <tr><td>Batch I/O</td><td>Citire/scriere bloc</td><td>10-100x</td></tr>
+                <tr><td>mmap()</td><td>Memory-mapped files</td><td>Variabil</td></tr>
+                <tr><td>Indexare</td><td>Index separat</td><td>O(log n)</td></tr>
+            </table>
+            <div class="code-block">
+                <div class="code-header"><span>Buffering</span><span class="lang-badge">C</span></div>
+                <pre><code class="language-c">char buf[64*1024];  // 64KB
+setvbuf(f, buf, _IOFBF, sizeof(buf));</code></pre>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="27">
+            <h2>🏭 Aplicații Industriale</h2>
+            <div class="summary-box">
+                <div class="summary-item">
+                    <div class="icon">🖼️</div>
+                    <h4>Multimedia</h4>
+                    <p>BMP, PNG, WAV, MP4</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">💾</div>
+                    <h4>Baze de Date</h4>
+                    <p>SQLite, MySQL</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">⚙️</div>
+                    <h4>Executabile</h4>
+                    <p>ELF, PE</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">🌐</div>
+                    <h4>Rețelistică</h4>
+                    <p>TCP/IP packets</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">🎮</div>
+                    <h4>Gaming</h4>
+                    <p>Save files</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">📊</div>
+                    <h4>Serializare</h4>
+                    <p>Protobuf</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="28">
+            <h2>✨ Best Practices</h2>
+            <div class="two-columns">
+                <div class="column">
+                    <h3 style="color: var(--accent-green);">DO ✓</h3>
+                    <ul>
+                        <li>Magic number pentru validare</li>
+                        <li>Versiune în header</li>
+                        <li>Tipuri dimensiune fixă</li>
+                        <li>#pragma pack structuri</li>
+                        <li>Verificare return values</li>
+                        <li>Documentare format</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3 style="color: var(--accent-red);">DON'T ✗</h3>
+                    <ul>
+                        <li>Ignorare endianness</li>
+                        <li>Presupunere dim. tipuri</li>
+                        <li>Scriere pointeri</li>
+                        <li>Uitare sufixul "b"</li>
+                        <li>Fișiere nedeschise</li>
+                        <li>Ignorare erori I/O</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="29">
+            <h2>🔬 Exercițiul 1: Catalog</h2>
+            <div class="info-box note">
+                <strong>Obiectiv:</strong> Sistem gestiune catalog studenți cu fișiere binare.
+            </div>
+            <ul>
+                <li>Structură Student: id, nume, grupa, 5 note, medie, activ</li>
+                <li>Header cu magic number și versiune</li>
+                <li>Operații CRUD complete</li>
+                <li>Căutare după ID</li>
+                <li>Soft delete</li>
+            </ul>
+            <p><strong>Punctaj: 50p</strong></p>
+        </div>
+
+        <div class="slide content-slide" data-slide="30">
+            <h2>🔬 Exercițiul 2: Convertor BMP</h2>
+            <div class="info-box note">
+                <strong>Obiectiv:</strong> Conversie imagine BMP color → grayscale.
+            </div>
+            <ul>
+                <li>Parsare header BMP</li>
+                <li>Validare format 24-bit</li>
+                <li>Conversie: Gray = 0.299R + 0.587G + 0.114B</li>
+                <li>Gestionare padding rânduri</li>
+                <li>Creare paletă grayscale 256</li>
+            </ul>
+            <p><strong>Punctaj: 50p</strong></p>
+        </div>
+
+        <div class="slide content-slide" data-slide="31">
+            <h2>📊 Text vs. Binar</h2>
+            <table>
+                <tr><th>Criteriu</th><th>Text</th><th>Binar</th></tr>
+                <tr><td>Dimensiune</td><td>Mai mare</td><td>Mai mică ✓</td></tr>
+                <tr><td>Viteză</td><td>Lentă</td><td>Rapidă ✓</td></tr>
+                <tr><td>Acces aleatoriu</td><td>Dificil</td><td>O(1) ✓</td></tr>
+                <tr><td>Portabilitate</td><td>Excelentă ✓</td><td>Atenție</td></tr>
+                <tr><td>Depanare</td><td>Ușoară ✓</td><td>Tools</td></tr>
+            </table>
+        </div>
+
+        <div class="slide content-slide" data-slide="32">
+            <h2>🎯 Puncte Cheie</h2>
+            <div class="summary-box">
+                <div class="summary-item">
+                    <div class="icon">1️⃣</div>
+                    <h4>fread/fwrite</h4>
+                    <p>Transfer direct memorie</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">2️⃣</div>
+                    <h4>fseek/ftell</h4>
+                    <p>Acces aleatoriu O(1)</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">3️⃣</div>
+                    <h4>Serializare</h4>
+                    <p>Structuri ↔ bytes</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">4️⃣</div>
+                    <h4>Padding</h4>
+                    <p>#pragma pack</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">5️⃣</div>
+                    <h4>Endianness</h4>
+                    <p>Portabilitate</p>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">6️⃣</div>
+                    <h4>Magic Number</h4>
+                    <p>Validare format</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide content-slide" data-slide="33">
+            <h2>📚 Resurse</h2>
+            <h3>Cărți</h3>
+            <ul>
+                <li>K&R - The C Programming Language, Cap. 8</li>
+                <li>Stevens & Rago - Advanced UNIX Programming</li>
+            </ul>
+            <h3>Online</h3>
+            <ul>
+                <li>GNU C Library Manual</li>
+                <li>cppreference.com</li>
+            </ul>
+            <h3>Utilitare</h3>
+            <ul>
+                <li>hexdump, xxd, od - Vizualizare</li>
+                <li>valgrind - Memory leaks</li>
+                <li>gdb - Depanare</li>
+            </ul>
+        </div>
+
+        <div class="slide title-slide" data-slide="34">
+            <h1>❓ Întrebări?</h1>
+            <p class="subtitle">Suntem aici să clarificăm orice neclaritate</p>
+            <div style="margin-top: 3rem;">
+                <p style="color: var(--text-secondary);">
+                    Săptămâna viitoare: <strong style="color: var(--accent-blue);">Liste Înlănțuite</strong>
+                </p>
+                <p style="color: var(--text-secondary); font-size: 1rem; margin-top: 1rem;">
+                    Alocare dinamică, pointeri la structuri, liste simplu și dublu înlănțuite.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-container">
+        <button class="nav-btn" onclick="prevSlide()" title="Slide anterior">←</button>
+        <button class="nav-btn" onclick="nextSlide()" title="Slide următor">→</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">34</span>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+        let currentSlide = 1;
+        const totalSlides = 34;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            const newSlide = document.querySelector(`[data-slide="${n}"]`);
+            if (newSlide) {
+                newSlide.classList.add('active');
+                currentSlide = n;
+                document.getElementById('currentSlide').textContent = currentSlide;
+                document.getElementById('progressBar').style.width = 
+                    ((currentSlide - 1) / (totalSlides - 1)) * 100 + '%';
+                window.location.hash = `slide-${currentSlide}`;
+            }
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); nextSlide(); break;
+                case 'ArrowLeft': case 'PageUp': e.preventDefault(); prevSlide(); break;
+                case 'Home': e.preventDefault(); showSlide(1); break;
+                case 'End': e.preventDefault(); showSlide(totalSlides); break;
+            }
+        });
+
+        window.addEventListener('load', function() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#slide-')) {
+                const slideNum = parseInt(hash.replace('#slide-', ''));
+                if (!isNaN(slideNum)) showSlide(slideNum);
+            }
+            document.getElementById('totalSlides').textContent = totalSlides;
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+        });
+    </script>
+</body>
+</html>

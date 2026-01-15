@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparație: Pseudocod → C → Python | Linked Lists</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+            --pseudocode-color: #79c0ff;
+            --c-color: #7ee787;
+            --python-color: #ffa657;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow: hidden;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pseudocode-color), var(--c-color), var(--python-color));
+            transition: width 0.3s ease;
+        }
+
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 50px 60px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-purple);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            height: calc(100% - 120px);
+        }
+
+        .column {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            padding: 0.8rem 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 2px solid;
+        }
+
+        .pseudocod .column-header {
+            background: rgba(121, 192, 255, 0.1);
+            color: var(--pseudocode-color);
+            border-color: var(--pseudocode-color);
+        }
+
+        .c-lang .column-header {
+            background: rgba(126, 231, 135, 0.1);
+            color: var(--c-color);
+            border-color: var(--c-color);
+        }
+
+        .python .column-header {
+            background: rgba(255, 166, 87, 0.1);
+            color: var(--python-color);
+            border-color: var(--python-color);
+        }
+
+        .column-content {
+            padding: 1rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .pseudo-code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--pseudocode-color);
+        }
+
+        .pseudo-keyword {
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        .pseudo-comment {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.7rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+        }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: 3rem;
+            border: none;
+        }
+
+        .language-icons {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            font-size: 1.5rem;
+        }
+
+        .lang-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lang-icon span:first-child {
+            font-size: 3rem;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 25px;
+            left: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th:nth-child(1) { width: 25%; }
+        .comparison-table th:nth-child(2) { color: var(--pseudocode-color); }
+        .comparison-table th:nth-child(3) { color: var(--c-color); }
+        .comparison-table th:nth-child(4) { color: var(--python-color); }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        .insight-box {
+            background: rgba(163, 113, 247, 0.1);
+            border: 1px solid var(--accent-purple);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="slides-container">
+
+        <!-- SLIDE 1: Titlu -->
+        <div class="slide title-slide active">
+            <h1>🔄 Comparație Limbaje</h1>
+            <p style="font-size: 1.5rem; color: var(--text-secondary);">Linked Lists în trei perspective</p>
+            <div class="language-icons">
+                <div class="lang-icon">
+                    <span>📝</span>
+                    <span style="color: var(--pseudocode-color);">Pseudocod</span>
+                </div>
+                <div class="lang-icon">
+                    <span>⚙️</span>
+                    <span style="color: var(--c-color);">C</span>
+                </div>
+                <div class="lang-icon">
+                    <span>🐍</span>
+                    <span style="color: var(--python-color);">Python</span>
+                </div>
+            </div>
+            <p style="color: var(--text-secondary);">Săptămâna 04 | ATP</p>
+        </div>
+
+        <!-- SLIDE 2: De ce comparăm? -->
+        <div class="slide">
+            <h1>❓ De Ce Comparăm Limbaje?</h1>
+            <div class="two-columns">
+                <div>
+                    <h2>Beneficii</h2>
+                    <ul>
+                        <li>Înțelegerea mai profundă a conceptelor</li>
+                        <li>Abstracție vs. implementare</li>
+                        <li>Recunoașterea pattern-urilor universale</li>
+                        <li>Pregătire pentru orice limbaj</li>
+                        <li>Gândire algoritmică independentă de sintaxă</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Perspectivele</h2>
+                    <ul>
+                        <li><strong style="color: var(--pseudocode-color);">Pseudocod:</strong> Algoritmul pur, fără sintaxă</li>
+                        <li><strong style="color: var(--c-color);">C:</strong> Control total, gestiune manuală a memoriei</li>
+                        <li><strong style="color: var(--python-color);">Python:</strong> Nivel înalt, productivitate</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <strong>💡 Concept cheie:</strong> Algoritmul rămâne același, doar implementarea diferă!
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Structura Node -->
+        <div class="slide">
+            <h1>🧱 Definiția Structurii Node</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">STRUCTURE</span> Node:
+    data: <span class="pseudo-keyword">ANY_TYPE</span>
+    next: <span class="pseudo-keyword">POINTER</span> to Node
+
+<span class="pseudo-comment">// Un nod conține:</span>
+<span class="pseudo-comment">// - datele utile</span>
+<span class="pseudo-comment">// - referință către următorul</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+
+/* Notă: folosim 'struct Node'
+   în interior deoarece typedef
+   nu e încă complet definit */</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+# Python: tipare dinamice
+# Nu e nevoie de pointeri
+# expliciti - totul e referință</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Creare Node -->
+        <div class="slide">
+            <h1>🔨 Crearea unui Node Nou</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> CreateNode(value):
+    new_node ← <span class="pseudo-keyword">ALLOCATE</span> Node
+    
+    <span class="pseudo-keyword">IF</span> new_node = NULL:
+        <span class="pseudo-keyword">RETURN</span> NULL
+    
+    new_node.data ← value
+    new_node.next ← NULL
+    
+    <span class="pseudo-keyword">RETURN</span> new_node
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">Node *create_node(int value) {
+    Node *new_node = 
+        (Node *)malloc(sizeof(Node));
+    
+    if (new_node == NULL) {
+        return NULL;
+    }
+    
+    new_node->data = value;
+    new_node->next = NULL;
+    
+    return new_node;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def create_node(value):
+    return Node(value)
+
+# Sau direct:
+new_node = Node(42)
+
+# Python gestionează memoria
+# automat - nu e nevoie de
+# malloc/free sau verificări</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Inserare la început -->
+        <div class="slide">
+            <h1>➡️ Inserare la Început (Prepend)</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> Prepend(head, value):
+    new_node ← CreateNode(value)
+    
+    <span class="pseudo-keyword">IF</span> new_node = NULL:
+        <span class="pseudo-keyword">RETURN</span>
+    
+    <span class="pseudo-comment">// Noul nod arată spre fostul cap</span>
+    new_node.next ← head
+    
+    <span class="pseudo-comment">// Actualizăm head-ul</span>
+    head ← new_node
+
+<span class="pseudo-comment">// Complexitate: O(1)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void prepend(Node **head, int value) {
+    Node *new_node = create_node(value);
+    if (new_node == NULL) return;
+    
+    // Noul nod -> fostul cap
+    new_node->next = *head;
+    
+    // Actualizăm head
+    *head = new_node;
+}
+
+// Notă: Node **head pentru a
+// modifica pointer-ul original</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">class LinkedList:
+    def __init__(self):
+        self.head = None
+    
+    def prepend(self, value):
+        new_node = Node(value)
+        new_node.next = self.head
+        self.head = new_node
+
+# Sau cu return:
+def prepend(head, value):
+    new_node = Node(value)
+    new_node.next = head
+    return new_node  # noul head</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Inserare la sfârșit -->
+        <div class="slide">
+            <h1>⬅️ Inserare la Sfârșit (Append)</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> Append(head, value):
+    new_node ← CreateNode(value)
+    
+    <span class="pseudo-keyword">IF</span> head = NULL:
+        head ← new_node
+        <span class="pseudo-keyword">RETURN</span>
+    
+    <span class="pseudo-comment">// Parcurge până la final</span>
+    current ← head
+    <span class="pseudo-keyword">WHILE</span> current.next ≠ NULL:
+        current ← current.next
+    
+    current.next ← new_node
+
+<span class="pseudo-comment">// Complexitate: O(n)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void append(Node **head, int value) {
+    Node *new_node = create_node(value);
+    if (new_node == NULL) return;
+    
+    // Lista goală?
+    if (*head == NULL) {
+        *head = new_node;
+        return;
+    }
+    
+    // Parcurge până la final
+    Node *current = *head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    
+    current->next = new_node;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def append(self, value):
+    new_node = Node(value)
+    
+    if self.head is None:
+        self.head = new_node
+        return
+    
+    # Parcurge până la final
+    current = self.head
+    while current.next:
+        current = current.next
+    
+    current.next = new_node
+
+# Python: 'is None' vs '== None'
+# while current.next: (Pythonic)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: Traversare și Afișare -->
+        <div class="slide">
+            <h1>🚶 Traversare și Afișare</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> PrintList(head):
+    current ← head
+    
+    <span class="pseudo-keyword">WHILE</span> current ≠ NULL:
+        <span class="pseudo-keyword">PRINT</span> current.data
+        current ← current.next
+    
+    <span class="pseudo-keyword">PRINT</span> "NULL"
+
+<span class="pseudo-comment">// Pattern universal:</span>
+<span class="pseudo-comment">// 1. Pornește de la head</span>
+<span class="pseudo-comment">// 2. Procesează nodul curent</span>
+<span class="pseudo-comment">// 3. Avansează la next</span>
+<span class="pseudo-comment">// 4. Repetă până la NULL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void print_list(Node *head) {
+    Node *current = head;
+    
+    printf("Lista: ");
+    while (current != NULL) {
+        printf("%d", current->data);
+        if (current->next != NULL) {
+            printf(" -> ");
+        }
+        current = current->next;
+    }
+    printf(" -> NULL\n");
+}
+
+// Complexitate: O(n)</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def print_list(self):
+    elements = []
+    current = self.head
+    
+    while current:
+        elements.append(str(current.data))
+        current = current.next
+    
+    print(" -> ".join(elements) + " -> None")
+
+# Sau cu __str__ magic method:
+def __str__(self):
+    # ... același cod
+    return " -> ".join(elements)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Căutare -->
+        <div class="slide">
+            <h1>🔍 Căutare în Listă</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> Search(head, value):
+    current ← head
+    
+    <span class="pseudo-keyword">WHILE</span> current ≠ NULL:
+        <span class="pseudo-keyword">IF</span> current.data = value:
+            <span class="pseudo-keyword">RETURN</span> current
+        current ← current.next
+    
+    <span class="pseudo-keyword">RETURN</span> NULL <span class="pseudo-comment">// Nu găsit</span>
+
+<span class="pseudo-comment">// Complexitate: O(n)</span>
+<span class="pseudo-comment">// Cel mai rău caz: parcurgem</span>
+<span class="pseudo-comment">// întreaga listă</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">Node *search(Node *head, int value) {
+    Node *current = head;
+    
+    while (current != NULL) {
+        if (current->data == value) {
+            return current;
+        }
+        current = current->next;
+    }
+    
+    return NULL;  // Nu găsit
+}
+
+// Utilizare:
+Node *found = search(head, 42);
+if (found != NULL) {
+    printf("Găsit: %d\n", found->data);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def search(self, value):
+    current = self.head
+    
+    while current:
+        if current.data == value:
+            return current
+        current = current.next
+    
+    return None
+
+# Pythonic: __contains__ pentru 'in'
+def __contains__(self, value):
+    return self.search(value) is not None
+
+# Utilizare: 42 in my_list</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Ștergere -->
+        <div class="slide">
+            <h1>🗑️ Ștergere Nod</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> Delete(head, value):
+    <span class="pseudo-keyword">IF</span> head = NULL: <span class="pseudo-keyword">RETURN</span>
+    
+    <span class="pseudo-comment">// Caz special: ștergem head</span>
+    <span class="pseudo-keyword">IF</span> head.data = value:
+        temp ← head
+        head ← head.next
+        <span class="pseudo-keyword">FREE</span>(temp)
+        <span class="pseudo-keyword">RETURN</span>
+    
+    <span class="pseudo-comment">// Găsește nodul anterior</span>
+    current ← head
+    <span class="pseudo-keyword">WHILE</span> current.next ≠ NULL
+          <span class="pseudo-keyword">AND</span> current.next.data ≠ value:
+        current ← current.next
+    
+    <span class="pseudo-comment">// Elimină dacă există</span>
+    <span class="pseudo-keyword">IF</span> current.next ≠ NULL:
+        temp ← current.next
+        current.next ← temp.next
+        <span class="pseudo-keyword">FREE</span>(temp)
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void delete_node(Node **head, int val) {
+    if (*head == NULL) return;
+    
+    // Ștergem head?
+    if ((*head)->data == val) {
+        Node *temp = *head;
+        *head = (*head)->next;
+        free(temp);
+        return;
+    }
+    
+    // Găsim nodul anterior
+    Node *curr = *head;
+    while (curr->next != NULL 
+           && curr->next->data != val) {
+        curr = curr->next;
+    }
+    
+    // Eliminăm
+    if (curr->next != NULL) {
+        Node *temp = curr->next;
+        curr->next = temp->next;
+        free(temp);
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def delete(self, value):
+    if self.head is None:
+        return
+    
+    # Ștergem head?
+    if self.head.data == value:
+        self.head = self.head.next
+        return  # GC eliberează memoria
+    
+    # Găsim nodul anterior
+    curr = self.head
+    while curr.next and curr.next.data != value:
+        curr = curr.next
+    
+    # Eliminăm
+    if curr.next:
+        curr.next = curr.next.next
+        # Garbage collector face free</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Eliberare memorie -->
+        <div class="slide">
+            <h1>🧹 Gestiunea Memoriei</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> FreeList(head):
+    <span class="pseudo-keyword">WHILE</span> head ≠ NULL:
+        temp ← head
+        head ← head.next
+        <span class="pseudo-keyword">FREE</span>(temp)
+    
+    head ← NULL
+
+<span class="pseudo-comment">// OBLIGATORIU în limbajele</span>
+<span class="pseudo-comment">// cu gestiune manuală!</span>
+
+<span class="pseudo-comment">// Alternativ, recursiv:</span>
+<span class="pseudo-keyword">FUNCTION</span> FreeRecursive(node):
+    <span class="pseudo-keyword">IF</span> node = NULL: <span class="pseudo-keyword">RETURN</span>
+    FreeRecursive(node.next)
+    <span class="pseudo-keyword">FREE</span>(node)
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void free_list(Node **head) {
+    Node *current = *head;
+    Node *next_node;
+    
+    while (current != NULL) {
+        next_node = current->next;
+        free(current);
+        current = next_node;
+    }
+    
+    *head = NULL;  // Siguranță
+}
+
+// OBLIGATORIU! Fără aceasta:
+// - Memory leak
+// - Valgrind raportează erori
+// - Programul "pierde" memorie</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python"># În Python: NU E NEVOIE!
+# Garbage Collector (GC) eliberează
+# automat memoria nefolosită
+
+# Pentru a "șterge" lista:
+my_list.head = None
+# sau
+del my_list
+
+# GC detectează nodurile fără
+# referințe și le eliberează
+
+# Totuși, pentru claritate:
+def clear(self):
+    self.head = None
+    # GC face restul</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: Inversare listă -->
+        <div class="slide">
+            <h1>🔄 Inversarea Listei</h1>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <div class="pseudo-code">
+<span class="pseudo-keyword">FUNCTION</span> Reverse(head):
+    prev ← NULL
+    current ← head
+    
+    <span class="pseudo-keyword">WHILE</span> current ≠ NULL:
+        <span class="pseudo-comment">// Salvează următorul</span>
+        next ← current.next
+        
+        <span class="pseudo-comment">// Inversează legătura</span>
+        current.next ← prev
+        
+        <span class="pseudo-comment">// Avansează</span>
+        prev ← current
+        current ← next
+    
+    head ← prev
+    <span class="pseudo-keyword">RETURN</span> head
+                        </div>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-c">void reverse(Node **head) {
+    Node *prev = NULL;
+    Node *current = *head;
+    Node *next_node = NULL;
+    
+    while (current != NULL) {
+        // Salvează
+        next_node = current->next;
+        
+        // Inversează
+        current->next = prev;
+        
+        // Avansează
+        prev = current;
+        current = next_node;
+    }
+    
+    *head = prev;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <div class="code-block">
+                            <pre><code class="language-python">def reverse(self):
+    prev = None
+    current = self.head
+    
+    while current:
+        # Salvează
+        next_node = current.next
+        
+        # Inversează
+        current.next = prev
+        
+        # Avansează
+        prev = current
+        current = next_node
+    
+    self.head = prev
+
+# Python permite și:
+# prev, current = current, next_node</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Tabel comparativ -->
+        <div class="slide">
+            <h1>📊 Tabel Comparativ</h1>
+            <table class="comparison-table">
+                <tr>
+                    <th>Aspect</th>
+                    <th>📝 Pseudocod</th>
+                    <th>⚙️ C</th>
+                    <th>🐍 Python</th>
+                </tr>
+                <tr>
+                    <td>Definire structură</td>
+                    <td>STRUCTURE</td>
+                    <td>typedef struct</td>
+                    <td>class</td>
+                </tr>
+                <tr>
+                    <td>Alocare memorie</td>
+                    <td>ALLOCATE</td>
+                    <td>malloc(sizeof())</td>
+                    <td>Automată (new)</td>
+                </tr>
+                <tr>
+                    <td>Eliberare memorie</td>
+                    <td>FREE</td>
+                    <td>free()</td>
+                    <td>Garbage Collector</td>
+                </tr>
+                <tr>
+                    <td>Verificare NULL</td>
+                    <td>= NULL</td>
+                    <td>== NULL</td>
+                    <td>is None</td>
+                </tr>
+                <tr>
+                    <td>Acces câmpuri</td>
+                    <td>node.data</td>
+                    <td>node->data</td>
+                    <td>node.data</td>
+                </tr>
+                <tr>
+                    <td>Modificare pointer</td>
+                    <td>Implicit</td>
+                    <td>Node **head</td>
+                    <td>self.head sau return</td>
+                </tr>
+                <tr>
+                    <td>Nivel</td>
+                    <td>Abstract</td>
+                    <td>Nivel scăzut</td>
+                    <td>Nivel înalt</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SLIDE 13: Când să folosești ce -->
+        <div class="slide">
+            <h1>🤔 Când Să Folosești Ce Limbaj?</h1>
+            <div class="two-columns">
+                <div>
+                    <h2 style="color: var(--c-color);">⚙️ Folosește C când:</h2>
+                    <ul>
+                        <li>Ai nevoie de <strong>performanță maximă</strong></li>
+                        <li>Lucrezi la nivel de <strong>sistem</strong> (OS, drivere)</li>
+                        <li>Memoria este <strong>limitată</strong> (embedded)</li>
+                        <li>Ai nevoie de <strong>control precis</strong> asupra memoriei</li>
+                        <li>Lucrezi cu <strong>hardware</strong> direct</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 style="color: var(--python-color);">🐍 Folosește Python când:</h2>
+                    <ul>
+                        <li>Prioritatea e <strong>productivitatea</strong></li>
+                        <li>Faci <strong>prototipare rapidă</strong></li>
+                        <li>Memoria nu e o constrângere</li>
+                        <li>Preferi cod <strong>clar și concis</strong></li>
+                        <li>Ai nevoie de <strong>ecosistem bogat</strong> (ML, web, etc.)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="insight-box">
+                <h3>💡 Observație importantă</h3>
+                <p>Înțelegerea linked lists în C te face un programator mai bun în <em>orice</em> limbaj! 
+                Știi ce se întâmplă "sub capotă" când folosești structuri de date în limbaje de nivel înalt.</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: Concluzii -->
+        <div class="slide">
+            <h1>✨ Concluzii Cheie</h1>
+            <div class="two-columns">
+                <div>
+                    <h2>Ce am învățat:</h2>
+                    <ul>
+                        <li><strong>Algoritmul</strong> este același în orice limbaj</li>
+                        <li>C necesită gestiune <strong>manuală</strong> a memoriei</li>
+                        <li>Python oferă <strong>abstractizare</strong> și productivitate</li>
+                        <li>Pseudocodul ajută la <strong>gândirea algoritmică</strong></li>
+                        <li>Fiecare limbaj are <strong>avantaje și dezavantaje</strong></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>De reținut:</h2>
+                    <ul>
+                        <li>În C: <code>malloc</code> + <code>free</code> = responsabilitatea ta</li>
+                        <li>În C: <code>Node **head</code> pentru modificări</li>
+                        <li>În Python: Garbage Collector gestionează memoria</li>
+                        <li>Pattern-ul de traversare e <strong>universal</strong></li>
+                        <li>Testează întotdeauna cazurile limită!</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <strong>🎯 Mesajul principal:</strong> Stăpânirea conceptelor în C te face expert în orice limbaj!
+            </div>
+        </div>
+
+        <!-- SLIDE 15: Final -->
+        <div class="slide title-slide">
+            <h1>🔗 Succes la Laborator!</h1>
+            <div class="language-icons" style="margin: 2rem 0;">
+                <div class="lang-icon">
+                    <span>📝</span>
+                    <span style="color: var(--pseudocode-color);">Gândește</span>
+                </div>
+                <div class="lang-icon">
+                    <span>⚙️</span>
+                    <span style="color: var(--c-color);">Implementează</span>
+                </div>
+                <div class="lang-icon">
+                    <span>🧪</span>
+                    <span style="color: var(--python-color);">Testează</span>
+                </div>
+            </div>
+            <p style="color: var(--text-secondary); margin-top: 2rem;">
+                Săptămâna 04 | Algoritmi și Tehnici de Programare
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="goToSlide(0)">⏮</button>
+        <button class="nav-btn" onclick="previousSlide()">◀</button>
+        <button class="nav-btn" onclick="nextSlide()">▶</button>
+        <button class="nav-btn" onclick="goToSlide(totalSlides - 1)">⏭</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+        
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('currentSlide').textContent = index + 1;
+            document.getElementById('progressBar').style.width = ((index + 1) / totalSlides * 100) + '%';
+        }
+        
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlideIndex = index;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousSlide();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides - 1);
+            }
+        });
+    </script>
+</body>
+</html>

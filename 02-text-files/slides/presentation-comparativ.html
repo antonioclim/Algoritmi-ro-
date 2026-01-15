@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparație: Pseudocod | C | Python - Fișiere Text</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --accent-orange: #f0883e;
+            --border-color: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-orange));
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .slides-container {
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 50px 60px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--accent-yellow);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        /* Three column layout */
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            flex: 1;
+        }
+
+        .column {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .column.pseudocod .column-header {
+            background: rgba(163, 113, 247, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .column.c-lang .column-header {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .column.python .column-header {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+
+        .column-content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .column-content pre {
+            margin: 0;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .column-content code {
+            font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: transparent !important;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+        }
+
+        th:nth-child(1) { color: var(--accent-purple); }
+        th:nth-child(2) { color: var(--accent-blue); }
+        th:nth-child(3) { color: var(--accent-green); }
+
+        tr:nth-child(even) {
+            background: var(--bg-secondary);
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .comparison-box {
+            background: rgba(210, 153, 34, 0.1);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Title slide */
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            z-index: 1000;
+        }
+
+        /* Language badges */
+        .lang-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .lang-icon.pseudo { background: var(--accent-purple); }
+        .lang-icon.c { background: var(--accent-blue); }
+        .lang-icon.py { background: var(--accent-green); }
+
+        ul {
+            margin: 10px 0 10px 25px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Highlight */
+        .hl-purple { color: var(--accent-purple); font-weight: 600; }
+        .hl-blue { color: var(--accent-blue); font-weight: 600; }
+        .hl-green { color: var(--accent-green); font-weight: 600; }
+        .hl-yellow { color: var(--accent-yellow); font-weight: 600; }
+
+        kbd {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="slides-container" id="slidesContainer">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active" data-slide="1">
+            <h1>📝 Pseudocod | ⚙️ C | 🐍 Python</h1>
+            <p class="subtitle">Comparație: Operații cu Fișiere Text</p>
+            <p style="color: var(--text-secondary); font-size: 1.2rem;">Săptămâna 02 | ATP</p>
+            <p style="margin-top: 40px; font-size: 1rem; color: var(--text-secondary);">
+                Navigare: <kbd>←</kbd> <kbd>→</kbd> sau <kbd>Space</kbd>
+            </p>
+        </div>
+
+        <!-- Slide 2: Why Compare? -->
+        <div class="slide" data-slide="2">
+            <h2>🤔 De ce comparăm limbaje?</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Beneficii pedagogice</h3>
+                    <ul>
+                        <li>Înțelegere profundă a conceptelor (nu doar a sintaxei)</li>
+                        <li>Transferabilitatea cunoștințelor între limbaje</li>
+                        <li>Aprecierea trade-off-urilor de design</li>
+                        <li>Pregătire pentru lumea reală (proiecte multi-limbaj)</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Observație:</strong> Algoritmul rămâne același, doar "vocabularul" diferă!
+                    </div>
+                </div>
+                <div>
+                    <h3>Caracteristici comparative</h3>
+                    <table>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>C</th>
+                            <th>Python</th>
+                        </tr>
+                        <tr>
+                            <td>Paradigmă</td>
+                            <td>Procedural</td>
+                            <td>Multi-paradigmă</td>
+                        </tr>
+                        <tr>
+                            <td>Tipare</td>
+                            <td>Static</td>
+                            <td>Dinamic</td>
+                        </tr>
+                        <tr>
+                            <td>Memorie</td>
+                            <td>Manual</td>
+                            <td>Garbage collected</td>
+                        </tr>
+                        <tr>
+                            <td>Nivel</td>
+                            <td>Scăzut/mediu</td>
+                            <td>Înalt</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Opening Files -->
+        <div class="slide" data-slide="3">
+            <h2>📂 Deschiderea unui Fișier</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM DeschideFișier
+INTRARE: nume_fișier, mod
+IEȘIRE: handle_fișier sau EROARE
+
+ÎNCEPUT
+    handle ← DESCHIDE(nume_fișier, mod)
+    
+    DACĂ handle = INVALID ATUNCI
+        AFIȘEAZĂ "Eroare: nu pot deschide"
+        RETURNEAZĂ EROARE
+    SFÂRȘIT_DACĂ
+    
+    RETURNEAZĂ handle
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">#include &lt;stdio.h&gt;
+
+FILE *fp = fopen("date.txt", "r");
+
+if (fp == NULL) {
+    perror("Eroare");
+    return -1;
+}
+
+/* Utilizare fișier... */
+
+fclose(fp);  /* Obligatoriu! */</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python"># Metoda clasică
+fp = open("date.txt", "r")
+# ... utilizare ...
+fp.close()
+
+# Metoda recomandată (context manager)
+with open("date.txt", "r") as fp:
+    # ... utilizare ...
+    pass
+# Închidere automată!</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-box">
+                <strong>💡 Observații:</strong> Python's <code>with</code> statement elimină riscul de a uita închiderea fișierului - echivalentul pattern-ului RAII din C++.
+            </div>
+        </div>
+
+        <!-- Slide 4: Reading Line by Line -->
+        <div class="slide" data-slide="4">
+            <h2>📖 Citirea Linie cu Linie</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM CitireLinii
+INTRARE: handle_fișier
+IEȘIRE: lista_linii
+
+ÎNCEPUT
+    linii ← listă_goală
+    
+    CÂT_TIMP NU SFÂRȘIT_FIȘIER(handle)
+        linie ← CITEȘTE_LINIE(handle)
+        ADAUGĂ linie LA linii
+    SFÂRȘIT_CÂT_TIMP
+    
+    RETURNEAZĂ linii
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">char line[256];
+int count = 0;
+
+while (fgets(line, sizeof(line), fp)) {
+    /* Elimină newline */
+    line[strcspn(line, "\n")] = '\0';
+    
+    printf("Linia %d: %s\n", 
+           ++count, line);
+}
+
+if (ferror(fp)) {
+    perror("Eroare citire");
+}</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python">with open("date.txt", "r") as fp:
+    # Metoda 1: iterare directă
+    for count, line in enumerate(fp, 1):
+        line = line.rstrip('\n')
+        print(f"Linia {count}: {line}")
+
+# Metoda 2: citire toate liniile
+with open("date.txt", "r") as fp:
+    lines = fp.readlines()
+    # sau
+    lines = fp.read().splitlines()</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-box">
+                <strong>💡 Diferențe cheie:</strong> C necesită buffer pre-alocat și gestionare manuală a newline; Python iterează natural și oferă metode multiple.
+            </div>
+        </div>
+
+        <!-- Slide 5: Parsing CSV -->
+        <div class="slide" data-slide="5">
+            <h2>📊 Parsarea unui Fișier CSV</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM ParseCSV
+INTRARE: linie
+IEȘIRE: lista_câmpuri
+
+ÎNCEPUT
+    câmpuri ← listă_goală
+    câmp_curent ← ""
+    
+    PENTRU fiecare caracter c DIN linie
+        DACĂ c = ',' ATUNCI
+            ADAUGĂ câmp_curent LA câmpuri
+            câmp_curent ← ""
+        ALTFEL
+            câmp_curent ← câmp_curent + c
+        SFÂRȘIT_DACĂ
+    SFÂRȘIT_PENTRU
+    
+    ADAUGĂ câmp_curent LA câmpuri
+    RETURNEAZĂ câmpuri
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">#include &lt;string.h&gt;
+
+void parse_csv(char *line) {
+    char *token;
+    int field = 0;
+    
+    /* strtok modifică string-ul! */
+    token = strtok(line, ",");
+    
+    while (token != NULL) {
+        printf("Câmp %d: %s\n", 
+               ++field, token);
+        token = strtok(NULL, ",");
+    }
+}
+
+/* Atenție: strtok nu e thread-safe!
+   Folosiți strtok_r pentru MT */</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python">import csv
+
+# Metoda simplă
+fields = line.split(',')
+
+# Metoda robustă (handle quotes)
+with open("data.csv") as fp:
+    reader = csv.reader(fp)
+    for row in reader:
+        print(row)  # listă de câmpuri
+
+# Cu dicționare (header automat)
+with open("data.csv") as fp:
+    reader = csv.DictReader(fp)
+    for row in reader:
+        print(row['nume'])</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-box">
+                <strong>💡 Avantaj Python:</strong> Modulul <code>csv</code> gestionează automat cazurile speciale (ghilimele, virgule în câmpuri).
+            </div>
+        </div>
+
+        <!-- Slide 6: Writing Formatted Output -->
+        <div class="slide" data-slide="6">
+            <h2>✍️ Scriere Formatată</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM ScrieRaport
+INTRARE: handle, studenți
+IEȘIRE: (fișier modificat)
+
+ÎNCEPUT
+    SCRIE handle, "ID,Nume,Medie"
+    SCRIE handle, NEWLINE
+    
+    PENTRU fiecare s DIN studenți
+        medie ← CALCUL_MEDIE(s.note)
+        
+        SCRIE handle, s.id
+        SCRIE handle, ","
+        SCRIE handle, s.nume
+        SCRIE handle, ","
+        SCRIE handle, FORMAT(medie, 2)
+        SCRIE handle, NEWLINE
+    SFÂRȘIT_PENTRU
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">void scrie_raport(FILE *fp, 
+                  Student s[], int n) {
+    fprintf(fp, "ID,Nume,Medie\n");
+    
+    for (int i = 0; i < n; i++) {
+        double medie = calc_medie(
+            s[i].note, 10);
+        
+        fprintf(fp, "%d,%s,%.2f\n",
+                s[i].id,
+                s[i].nume,
+                medie);
+    }
+    
+    fflush(fp);  /* Forțează scriere */
+}</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python">def scrie_raport(filename, studenti):
+    with open(filename, 'w') as fp:
+        fp.write("ID,Nume,Medie\n")
+        
+        for s in studenti:
+            medie = sum(s.note) / len(s.note)
+            fp.write(f"{s.id},{s.nume},"
+                     f"{medie:.2f}\n")
+
+# Sau cu csv.writer
+import csv
+with open(filename, 'w', newline='') as fp:
+    writer = csv.writer(fp)
+    writer.writerow(['ID', 'Nume', 'Medie'])
+    for s in studenti:
+        writer.writerow([s.id, s.nume, 
+                        f"{medie:.2f}"])</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Error Handling -->
+        <div class="slide" data-slide="7">
+            <h2>⚠️ Gestionarea Erorilor</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM CitireSigură
+INTRARE: nume_fișier
+IEȘIRE: conținut sau EROARE
+
+ÎNCEPUT
+    ÎNCEARCĂ
+        handle ← DESCHIDE(nume_fișier)
+        conținut ← CITEȘTE_TOT(handle)
+        ÎNCHIDE(handle)
+        RETURNEAZĂ conținut
+        
+    PRINDE EroareFișier CA e
+        RAPORTEAZĂ "Eroare: " + e.mesaj
+        RETURNEAZĂ EROARE
+        
+    PRINDE EroareMemorie
+        RAPORTEAZĂ "Memorie insuficientă"
+        RETURNEAZĂ EROARE
+    SFÂRȘIT_ÎNCEARCĂ
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+
+int citire_sigura(const char *fname) {
+    FILE *fp = fopen(fname, "r");
+    if (!fp) {
+        fprintf(stderr, "Eroare %s: %s\n",
+                fname, strerror(errno));
+        return -1;
+    }
+    
+    char buf[256];
+    while (fgets(buf, sizeof(buf), fp)) {
+        /* procesare */
+    }
+    
+    if (ferror(fp)) {
+        perror("Eroare citire");
+        fclose(fp);
+        return -1;
+    }
+    
+    fclose(fp);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python">def citire_sigura(filename):
+    try:
+        with open(filename, 'r') as fp:
+            return fp.read()
+            
+    except FileNotFoundError:
+        print(f"Fișierul {filename} "
+              "nu există")
+        return None
+        
+    except PermissionError:
+        print(f"Acces interzis la "
+              f"{filename}")
+        return None
+        
+    except IOError as e:
+        print(f"Eroare I/O: {e}")
+        return None</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-box">
+                <strong>💡 Diferență:</strong> C folosește coduri de eroare și <code>errno</code>; Python folosește excepții (try/except).
+            </div>
+        </div>
+
+        <!-- Slide 8: File Statistics -->
+        <div class="slide" data-slide="8">
+            <h2>📈 Calculare Statistici din Fișier</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <div class="column-header">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <pre><code class="language-plaintext">ALGORITM StatisticiNote
+INTRARE: nume_fișier
+IEȘIRE: (min, max, medie, total)
+
+ÎNCEPUT
+    total ← 0
+    suma ← 0
+    min ← +INFINIT
+    max ← -INFINIT
+    
+    handle ← DESCHIDE(nume_fișier)
+    
+    CÂT_TIMP NU SFÂRȘIT(handle)
+        valoare ← CITEȘTE_NUMĂR(handle)
+        suma ← suma + valoare
+        total ← total + 1
+        min ← MINIM(min, valoare)
+        max ← MAXIM(max, valoare)
+    SFÂRȘIT_CÂT_TIMP
+    
+    medie ← suma / total
+    RETURNEAZĂ (min, max, medie, total)
+SFÂRȘIT</code></pre>
+                    </div>
+                </div>
+                <div class="column c-lang">
+                    <div class="column-header">⚙️ C</div>
+                    <div class="column-content">
+                        <pre><code class="language-c">typedef struct {
+    double min, max, avg;
+    int count;
+} Stats;
+
+Stats calc_stats(const char *fname) {
+    Stats s = {DBL_MAX, -DBL_MAX, 0, 0};
+    FILE *fp = fopen(fname, "r");
+    double val, sum = 0;
+    
+    while (fscanf(fp, "%lf", &val) == 1) {
+        if (val < s.min) s.min = val;
+        if (val > s.max) s.max = val;
+        sum += val;
+        s.count++;
+    }
+    
+    s.avg = (s.count > 0) ? 
+            sum / s.count : 0;
+    fclose(fp);
+    return s;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="column python">
+                    <div class="column-header">🐍 Python</div>
+                    <div class="column-content">
+                        <pre><code class="language-python">from statistics import mean
+
+def calc_stats(filename):
+    with open(filename) as fp:
+        values = [float(line) 
+                  for line in fp 
+                  if line.strip()]
+    
+    if not values:
+        return None
+    
+    return {
+        'min': min(values),
+        'max': max(values),
+        'avg': mean(values),
+        'count': len(values)
+    }
+
+# Alternativ (one-liner style)
+stats = lambda f: (vals := [float(l) 
+    for l in open(f)]) and {
+    'min': min(vals), 'max': max(vals),
+    'avg': sum(vals)/len(vals)}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Comparison Table -->
+        <div class="slide" data-slide="9">
+            <h2>📋 Tabel Comparativ Complet</h2>
+            <table style="font-size: 0.95rem;">
+                <tr>
+                    <th style="width: 20%;">Operație</th>
+                    <th style="width: 40%;">C</th>
+                    <th style="width: 40%;">Python</th>
+                </tr>
+                <tr>
+                    <td>Deschidere</td>
+                    <td><code>FILE *fp = fopen(name, mode)</code></td>
+                    <td><code>fp = open(name, mode)</code></td>
+                </tr>
+                <tr>
+                    <td>Închidere</td>
+                    <td><code>fclose(fp)</code> <span class="hl-yellow">(obligatoriu!)</span></td>
+                    <td><code>fp.close()</code> sau <code>with</code> (auto)</td>
+                </tr>
+                <tr>
+                    <td>Citire linie</td>
+                    <td><code>fgets(buf, size, fp)</code></td>
+                    <td><code>line = fp.readline()</code></td>
+                </tr>
+                <tr>
+                    <td>Citire tot</td>
+                    <td>Loop cu <code>fgets()</code></td>
+                    <td><code>content = fp.read()</code></td>
+                </tr>
+                <tr>
+                    <td>Scriere</td>
+                    <td><code>fprintf(fp, format, ...)</code></td>
+                    <td><code>fp.write(str)</code> sau <code>print(file=fp)</code></td>
+                </tr>
+                <tr>
+                    <td>Verificare EOF</td>
+                    <td><code>feof(fp)</code> (după citire!)</td>
+                    <td>Implicit (iterare returnează nimic)</td>
+                </tr>
+                <tr>
+                    <td>Verificare erori</td>
+                    <td><code>ferror(fp)</code>, <code>errno</code></td>
+                    <td><code>try/except IOError</code></td>
+                </tr>
+                <tr>
+                    <td>Poziționare</td>
+                    <td><code>fseek(fp, offset, whence)</code></td>
+                    <td><code>fp.seek(offset, whence)</code></td>
+                </tr>
+                <tr>
+                    <td>Flush buffer</td>
+                    <td><code>fflush(fp)</code></td>
+                    <td><code>fp.flush()</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 10: When to Use Which -->
+        <div class="slide" data-slide="10">
+            <h2>🎯 Când să Folosești Care Limbaj?</h2>
+            <div class="two-columns">
+                <div>
+                    <h3><span class="lang-icon c">⚙️</span> Alege C când:</h3>
+                    <ul>
+                        <li>Performanța este critică (procesare terabytes)</li>
+                        <li>Resurse limitate (embedded, IoT)</li>
+                        <li>Integrare cu kernel/drivere</li>
+                        <li>Control total asupra memoriei</li>
+                        <li>Portabilitate la nivel de cod sursă</li>
+                        <li>Aplicații real-time</li>
+                    </ul>
+                    
+                    <div class="info-box" style="border-color: var(--accent-blue);">
+                        <strong>Exemplu:</strong> Procesarea log-urilor de server cu milioane de linii pe secundă.
+                    </div>
+                </div>
+                <div>
+                    <h3><span class="lang-icon py">🐍</span> Alege Python când:</h3>
+                    <ul>
+                        <li>Productivitate e mai importantă decât viteza</li>
+                        <li>Prototipare rapidă</li>
+                        <li>Scripturi și automatizare</li>
+                        <li>Procesare date / Data Science</li>
+                        <li>Format complex (JSON, XML, YAML)</li>
+                        <li>Integrare cu biblioteci externe</li>
+                    </ul>
+                    
+                    <div class="info-box" style="border-color: var(--accent-green);">
+                        <strong>Exemplu:</strong> Script ETL pentru transformarea datelor dintr-un CSV în format JSON.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Key Insights -->
+        <div class="slide" data-slide="11">
+            <h2>💡 Concluzii Cheie</h2>
+            <div class="three-columns" style="gap: 30px;">
+                <div class="column" style="background: rgba(163, 113, 247, 0.1); border-color: var(--accent-purple);">
+                    <div class="column-header" style="background: transparent;">📝 Pseudocod</div>
+                    <div class="column-content">
+                        <ul>
+                            <li>Focalizat pe <strong>algoritm</strong></li>
+                            <li>Independent de limbaj</li>
+                            <li>Ideal pentru planificare</li>
+                            <li>Comunicare cu non-programatori</li>
+                        </ul>
+                        <p style="margin-top: 20px;"><strong>Folosește-l pentru:</strong> Gândire, design, documentare</p>
+                    </div>
+                </div>
+                <div class="column" style="background: rgba(88, 166, 255, 0.1); border-color: var(--accent-blue);">
+                    <div class="column-header" style="background: transparent;">⚙️ C</div>
+                    <div class="column-content">
+                        <ul>
+                            <li>Control <strong>explicit</strong></li>
+                            <li>Performanță predictibilă</li>
+                            <li>Aproape de hardware</li>
+                            <li>Responsabilitate programator</li>
+                        </ul>
+                        <p style="margin-top: 20px;"><strong>Folosește-l pentru:</strong> Sisteme, performanță, embedded</p>
+                    </div>
+                </div>
+                <div class="column" style="background: rgba(63, 185, 80, 0.1); border-color: var(--accent-green);">
+                    <div class="column-header" style="background: transparent;">🐍 Python</div>
+                    <div class="column-content">
+                        <ul>
+                            <li>Abstracție <strong>înaltă</strong></li>
+                            <li>Productivitate maximă</li>
+                            <li>Biblioteci bogate</li>
+                            <li>Garbage collection</li>
+                        </ul>
+                        <p style="margin-top: 20px;"><strong>Folosește-l pentru:</strong> Scripturi, data science, web</p>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-box" style="margin-top: 30px;">
+                <strong>🎓 Regula de aur:</strong> Învață conceptele în pseudocod, implementează în C pentru înțelegere profundă, apoi treci la Python pentru productivitate. Această ordine construiește fundația corectă!
+            </div>
+        </div>
+
+        <!-- Slide 12: End -->
+        <div class="slide title-slide" data-slide="12">
+            <h1>🎯 Recapitulare Completă</h1>
+            <p class="subtitle">Algoritmul e universal, sintaxa diferă</p>
+            <div style="margin-top: 40px; display: flex; justify-content: center; gap: 40px;">
+                <div style="text-align: center;">
+                    <div class="lang-icon pseudo" style="width: 60px; height: 60px; font-size: 2rem; margin: 0 auto 10px;">📝</div>
+                    <p>Pseudocod</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Gândește</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="lang-icon c" style="width: 60px; height: 60px; font-size: 2rem; margin: 0 auto 10px;">⚙️</div>
+                    <p>C</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Înțelege</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="lang-icon py" style="width: 60px; height: 60px; font-size: 2rem; margin: 0 auto 10px;">🐍</div>
+                    <p>Python</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Produce</p>
+                </div>
+            </div>
+            <p style="margin-top: 50px; color: var(--text-secondary);">
+                Săptămâna 02 | ATP | ASE București
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+    
+    <div class="nav-container">
+        <button class="nav-btn" onclick="prevSlide()">◀ Înapoi</button>
+        <button class="nav-btn" onclick="nextSlide()">Înainte ▶</button>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide;
+            
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function nextSlide() { currentSlide++; showSlide(currentSlide); }
+        function prevSlide() { currentSlide--; showSlide(currentSlide); }
+
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown':
+                    e.preventDefault(); nextSlide(); break;
+                case 'ArrowLeft': case 'PageUp':
+                    e.preventDefault(); prevSlide(); break;
+                case 'Home':
+                    e.preventDefault(); currentSlide = 1; showSlide(currentSlide); break;
+                case 'End':
+                    e.preventDefault(); currentSlide = totalSlides; showSlide(currentSlide); break;
+            }
+        });
+
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>

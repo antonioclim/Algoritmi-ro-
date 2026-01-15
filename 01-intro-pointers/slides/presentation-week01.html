@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Săptămâna 01: Pointeri la Funcții și Callbacks în C | Curs ATP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s ease;
+        }
+        
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-title {
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slide-title .emoji {
+            font-size: 1.2em;
+        }
+        
+        .slide-subtitle {
+            font-size: 1.3em;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            flex: 1;
+        }
+        
+        .content-box {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content-box h3 {
+            color: var(--accent-green);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .content-box ul {
+            list-style: none;
+        }
+        
+        .content-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+        
+        .content-box li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .code-header {
+            background: var(--bg-tertiary);
+            padding: 10px 15px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-header .lang-badge {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .code-block pre {
+            padding: 20px;
+            overflow-x: auto;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(163, 113, 247, 0.1));
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        
+        .warning-box {
+            background: rgba(248, 81, 73, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        
+        .success-box {
+            background: rgba(63, 185, 80, 0.1);
+            border-left: 4px solid var(--accent-green);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        
+        .quote-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-orange);
+            padding: 25px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        
+        .quote-author {
+            text-align: right;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-style: normal;
+        }
+        
+        .memory-diagram {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .memory-cell {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+            transition: all 0.3s ease;
+        }
+        
+        .memory-cell:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+        
+        .memory-cell .address {
+            font-size: 0.75em;
+            color: var(--accent-purple);
+            margin-bottom: 5px;
+        }
+        
+        .memory-cell .value {
+            font-size: 1.1em;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        
+        .memory-cell .name {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .arrow {
+            display: flex;
+            align-items: center;
+            font-size: 1.5em;
+            color: var(--accent-orange);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            text-align: left;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .comparison-table tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--bg-tertiary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .title-slide h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .title-slide .subtitle {
+            font-size: 1.5em;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        .title-slide .meta {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-blue);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+        }
+        
+        .timeline-year {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .interactive-demo {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .demo-btn:hover, .demo-btn.active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+        
+        .demo-output {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            min-height: 60px;
+        }
+        
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .profile-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            max-width: 300px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .profile-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid var(--accent-blue);
+        }
+        
+        .profile-card h3 {
+            color: var(--accent-blue);
+            margin-bottom: 5px;
+        }
+        
+        .profile-card .years {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        .profile-card .achievements {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        .syntax-breakdown {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.3em;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .syntax-part {
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: help;
+            transition: all 0.2s ease;
+        }
+        
+        .syntax-part:hover {
+            transform: translateY(-3px);
+        }
+        
+        .syntax-return { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+        .syntax-parens { background: rgba(210, 153, 34, 0.2); color: var(--accent-orange); }
+        .syntax-pointer { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+        .syntax-name { background: rgba(88, 166, 255, 0.2); color: var(--accent-blue); }
+        .syntax-params { background: rgba(163, 113, 247, 0.2); color: var(--accent-purple); }
+        
+        .complexity-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .complexity-card .big-o {
+            font-size: 2em;
+            color: var(--accent-green);
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .complexity-card .label {
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+        
+        .kbd {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        @media (max-width: 900px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .slide {
+                padding: 20px;
+            }
+            
+            .slide-title {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <!-- ==================== SLIDE 1: TITLU ==================== -->
+        <div class="slide active title-slide" data-slide="1">
+            <h1>🎯 Pointeri la Funcții și Callbacks</h1>
+            <p class="subtitle">Săptămâna 01 | Algoritmi și Tehnici de Programare</p>
+            <p class="meta">ASE-CSIE | Departamentul de Informatică Economică</p>
+            <div style="margin-top: 40px;">
+                <span class="kbd">←</span> <span class="kbd">→</span> sau butoanele pentru navigare
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 2: OBIECTIVE ==================== -->
+        <div class="slide" data-slide="2">
+            <h2 class="slide-title"><span class="emoji">🎯</span> Obiective de Învățare</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>La finalul acestei lecții, vei putea:</h3>
+                    <ul>
+                        <li>Explica ce sunt pointerii la funcții și de ce sunt importanți</li>
+                        <li>Declara, atribui și apela pointeri la funcții corect</li>
+                        <li>Implementa pattern-ul callback pentru algoritmi generici</li>
+                        <li>Utiliza qsort() și bsearch() din biblioteca standard C</li>
+                        <li>Proiecta dispatch tables folosind array-uri de pointeri</li>
+                        <li>Recunoaște aplicații industriale ale callback-urilor</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Prerechizite:</h3>
+                    <ul>
+                        <li>Înțelegere solidă a pointerilor în C</li>
+                        <li>Declararea și definirea funcțiilor</li>
+                        <li>Cunoștințe de bază despre array-uri și structuri</li>
+                        <li>Familiaritate cu void* (pointeri generici)</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 20px;">
+                        <strong>Idee Cheie:</strong> Pointerii la funcții sunt modalitatea C de a obține polimorfism și funcții de ordin superior!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 3: CONTEXT ISTORIC ==================== -->
+        <div class="slide" data-slide="3">
+            <h2 class="slide-title"><span class="emoji">📜</span> Context Istoric</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Nașterea Limbajului C (1969-1973)</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">1969</div>
+                            <p>Ken Thompson creează limbajul B pentru Unix timpuriu</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">1972</div>
+                            <p>Dennis Ritchie evoluează B în C la Bell Labs</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">1973</div>
+                            <p>Kernel-ul Unix rescris în C (90%+ din cod)</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">1978</div>
+                            <p>K&R „The C Programming Language" publicat</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">1989</div>
+                            <p>ANSI C standardizat (C89)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>De ce Pointeri la Funcții?</h3>
+                    <p style="margin-bottom: 15px;">C a fost proiectat să fie apropiat de hardware, rămânând portabil. Pointerii la funcții oglindesc direct concepte din limbajul de asamblare:</p>
+                    <div class="highlight-box">
+                        <code>(*fptr)()</code> se compilează în:
+                        <ol style="margin-top: 10px; color: var(--text-secondary);">
+                            <li>Încarcă adresa în registru</li>
+                            <li>Execută instrucțiunea CALL indirectă</li>
+                        </ol>
+                    </div>
+                    <p style="margin-top: 15px; color: var(--text-secondary);">Această mapare 1:1 către hardware face C eficient pentru programarea sistemelor, permițând în același timp abstracții puternice.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 4: DENNIS RITCHIE ==================== -->
+        <div class="slide" data-slide="4">
+            <h2 class="slide-title"><span class="emoji">👨‍💻</span> Figură Cheie: Dennis Ritchie</h2>
+            <div class="flex-center">
+                <div class="profile-card">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 3em;">👤</div>
+                    <h3>Dennis M. Ritchie</h3>
+                    <p class="years">1941 - 2011</p>
+                    <div class="achievements">
+                        <p>🏆 Premiul Turing 1983</p>
+                        <p>🖥️ Creatorul limbajului C</p>
+                        <p>🐧 Co-creator Unix</p>
+                        <p>📚 Co-autor K&R</p>
+                    </div>
+                </div>
+                <div style="max-width: 500px;">
+                    <div class="quote-box">
+                        „C nu este un limbaj de nivel „foarte înalt", nici unul „mare", și nu este specializat pentru nicio zonă particulară de aplicație. Dar absența restricțiilor și generalitatea sa îl fac mai convenabil și mai eficient pentru multe sarcini decât limbajele presupus mai puternice."
+                        <div class="quote-author">— K&R, Prefața Primei Ediții</div>
+                    </div>
+                    <div class="success-box">
+                        <strong>Filosofia Încrederii:</strong> „Programatorii știu ce fac; li se cere doar să-și exprime intențiile explicit."
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 5: CE ESTE UN POINTER LA FUNCȚIE ==================== -->
+        <div class="slide" data-slide="5">
+            <h2 class="slide-title"><span class="emoji">🔍</span> Ce este un Pointer la Funcție?</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Definiție</h3>
+                    <p>Un <strong>pointer la funcție</strong> este o variabilă care stochează adresa de memorie a unei funcții. La fel cum pointerii la date indică spre date, pointerii la funcții indică spre cod executabil.</p>
+                    
+                    <div class="memory-diagram" style="margin-top: 20px;">
+                        <div class="memory-cell">
+                            <div class="address">0x4005f0</div>
+                            <div class="value">int add()</div>
+                            <div class="name">Segment cod</div>
+                        </div>
+                        <div class="arrow">←</div>
+                        <div class="memory-cell">
+                            <div class="address">0x7fff...</div>
+                            <div class="value">0x4005f0</div>
+                            <div class="name">fptr</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Caracteristici Cheie</h3>
+                    <ul>
+                        <li>Stochează adresa primei instrucțiuni a funcției</li>
+                        <li>Trebuie să corespundă semnăturii funcției (tip returnat + parametri)</li>
+                        <li>Poate fi apelat ca o funcție obișnuită</li>
+                        <li>Permite selectarea funcțiilor la runtime</li>
+                        <li>Fundament pentru callbacks și polimorfism în C</li>
+                    </ul>
+                    <div class="warning-box" style="margin-top: 15px;">
+                        <strong>Atenție:</strong> Tipul unui pointer la funcție include atât tipul returnat CÂT ȘI tipurile parametrilor. Nepotrivirile cauzează comportament nedefinit!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 6: ANALIZA SINTAXEI ==================== -->
+        <div class="slide" data-slide="6">
+            <h2 class="slide-title"><span class="emoji">🔤</span> Analiza Sintaxei</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Declararea unui pointer la funcție:</p>
+            
+            <div class="syntax-breakdown">
+                <span class="syntax-part syntax-return" title="Tipul returnat al funcției">int</span>
+                <span class="syntax-part syntax-parens" title="Paranteze obligatorii!">(</span>
+                <span class="syntax-part syntax-pointer" title="Asterisc - este pointer">*</span>
+                <span class="syntax-part syntax-name" title="Numele variabilei pointer">fptr</span>
+                <span class="syntax-part syntax-parens" title="Paranteze obligatorii!">)</span>
+                <span class="syntax-part syntax-params" title="Tipurile parametrilor">(int, int)</span>
+            </div>
+            
+            <div class="content-grid" style="margin-top: 30px;">
+                <div class="content-box">
+                    <h3>Citirea Declarației</h3>
+                    <p><code>fptr</code> este un pointer la o funcție care:</p>
+                    <ul>
+                        <li>Primește <strong>doi parametri int</strong></li>
+                        <li>Returnează un <strong>int</strong></li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 15px;">
+                        <strong>Parantezele din jurul <code>*fptr</code> sunt CRITICE!</strong>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Greșeală Frecventă</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Comparație</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// Pointer la funcție (corect)
+int (*fptr)(int);
+
+// Funcție care returnează pointer la int (DIFERIT!)
+int *fptr(int);</code></pre>
+                    </div>
+                    <p style="color: var(--accent-red);">Fără paranteze, declari o funcție, nu un pointer!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 7: MODELE DE DECLARARE ==================== -->
+        <div class="slide" data-slide="7">
+            <h2 class="slide-title"><span class="emoji">📝</span> Modele de Declarare</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Diverse declarații de pointeri la funcții</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">// Pointer la funcție fără parametri, care returnează void
+void (*simplu)(void);
+
+// Pointer la funcție care primește 2 int, returnează int
+int (*operatie_binara)(int, int);
+
+// Pointer la funcție care primește const char*, returnează int
+int (*func_string)(const char*);
+
+// Pointer la funcție care primește void*, returnează void*
+void* (*generic)(void*);
+
+// Pointer la funcție comparator (folosit de qsort/bsearch)
+int (*comparator)(const void*, const void*);
+
+// Array de pointeri la funcții
+int (*operatii[4])(int, int);
+
+// Funcție care returnează un pointer la funcție
+int (*obtine_operatie(char op))(int, int);</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>Sfat Pro:</strong> Folosește <code>typedef</code> pentru a simplifica declarațiile complexe și a îmbunătăți lizibilitatea.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 8: TYPEDEF PENTRU CLARITATE ==================== -->
+        <div class="slide" data-slide="8">
+            <h2 class="slide-title"><span class="emoji">✨</span> Utilizarea typedef pentru Claritate</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Fără typedef</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Complex și greu de citit</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// Declarație
+int (*operatii[4])(int, int);
+
+// Parametru de funcție
+void proceseaza(int (*op)(int, int));
+
+// Tip de return
+int (*obtine_op(char c))(int, int);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Cu typedef</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Clar și lizibil</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// Definește tipul o singură dată
+typedef int (*OperatieBinara)(int, int);
+
+// Declarații clare
+OperatieBinara operatii[4];
+
+// Parametru clar
+void proceseaza(OperatieBinara op);
+
+// Tip de return clar
+OperatieBinara obtine_op(char c);</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <strong>Bună Practică:</strong> Folosește întotdeauna typedef pentru tipurile de pointeri la funcții în codul real. Îmbunătățește dramatic mentenabilitatea.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 9: ATRIBUIREA POINTERILOR ==================== -->
+        <div class="slide" data-slide="9">
+            <h2 class="slide-title"><span class="emoji">➡️</span> Atribuirea Pointerilor la Funcții</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Două metode echivalente de atribuire</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int aduna(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    // Declară un pointer la funcție
+    int (*operatie)(int, int);
+    
+    // Metoda 1: Folosind operatorul adresă (explicit)
+    operatie = &aduna;
+    
+    // Metoda 2: Atribuire directă (conversie implicită)
+    operatie = aduna;  // Numele funcției se convertește în pointer
+    
+    // Ambele metode sunt valide și echivalente!
+    
+    return 0;
+}</code></pre>
+            </div>
+            <div class="content-grid" style="margin-top: 20px;">
+                <div class="highlight-box">
+                    <strong>Notă:</strong> Numele funcției se „degradează" automat la un pointer către funcție, similar cu modul în care numele array-urilor se degradează la pointeri. Ambele forme sunt C corect.
+                </div>
+                <div class="warning-box">
+                    <strong>Siguranța Tipurilor:</strong> Compilatorul va avertiza dacă atribui o funcție cu semnătură diferită. Acordă întotdeauna atenție acestor avertismente!
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 10: APELUL PRIN POINTERI ==================== -->
+        <div class="slide" data-slide="10">
+            <h2 class="slide-title"><span class="emoji">📞</span> Apelul prin Pointeri la Funcții</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Două metode echivalente de apel</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int inmulteste(int a, int b) {
+    return a * b;
+}
+
+int main() {
+    int (*op)(int, int) = inmulteste;
+    
+    // Metoda 1: Apel direct (modernă, preferată)
+    int rezultat1 = op(5, 3);
+    
+    // Metoda 2: Dereferențiere explicită (tradițională)
+    int rezultat2 = (*op)(5, 3);
+    
+    printf("Rezultat 1: %d\n", rezultat1);  // 15
+    printf("Rezultat 2: %d\n", rezultat2);  // 15
+    
+    // Ambele produc același rezultat!
+    return 0;
+}</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>Stil Modern:</strong> Sintaxa de apel direct <code>op(5, 3)</code> este preferată în C modern. Sintaxa cu dereferențiere <code>(*op)(5, 3)</code> este din standardele mai vechi, dar încă validă.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 11: PATTERN-UL CALLBACK ==================== -->
+        <div class="slide" data-slide="11">
+            <h2 class="slide-title"><span class="emoji">🔄</span> Pattern-ul Callback</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Ce este un Callback?</h3>
+                    <p>Un <strong>callback</strong> este o funcție transmisă ca argument unei alte funcții, pentru a fi „apelată înapoi" mai târziu.</p>
+                    <div style="margin: 20px 0; text-align: center;">
+                        <div class="memory-diagram" style="justify-content: center;">
+                            <div class="memory-cell" style="background: var(--accent-blue); color: var(--bg-primary);">
+                                <div class="value">Codul Tău</div>
+                            </div>
+                            <div class="arrow">→</div>
+                            <div class="memory-cell">
+                                <div class="value">Bibliotecă</div>
+                            </div>
+                            <div class="arrow">→</div>
+                            <div class="memory-cell" style="background: var(--accent-green); color: var(--bg-primary);">
+                                <div class="value">Callback</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; color: var(--text-secondary);">Biblioteca apelează funcția TA!</p>
+                </div>
+                <div class="content-box">
+                    <h3>De ce să folosești Callbacks?</h3>
+                    <ul>
+                        <li><strong>Personalizare:</strong> Algoritmi generici cu comportament personalizat</li>
+                        <li><strong>Gestionarea Evenimentelor:</strong> Reacție asincronă la evenimente</li>
+                        <li><strong>Inversarea Controlului:</strong> Framework-ul apelează codul tău</li>
+                        <li><strong>Decuplare:</strong> Separarea algoritmului de politică</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 15px;">
+                        <strong>Idee Cheie:</strong> Callback-urile permit scrierea de cod generic, reutilizabil, care funcționează cu orice funcție compatibilă!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 12: EXEMPLU CALLBACK ==================== -->
+        <div class="slide" data-slide="12">
+            <h2 class="slide-title"><span class="emoji">💡</span> Exemplu Callback: Aplicare Generică</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>O funcție generică care aplică o operație</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+
+// Definește operații
+int aduna(int a, int b) { return a + b; }
+int scade(int a, int b) { return a - b; }
+int inmulteste(int a, int b) { return a * b; }
+int imparte(int a, int b) { return b != 0 ? a / b : 0; }
+
+// Funcție generică care acceptă un callback
+int aplica_operatie(int x, int y, int (*operatie)(int, int)) {
+    return operatie(x, y);  // Apelează callback-ul!
+}
+
+int main() {
+    int a = 20, b = 5;
+    
+    printf("%d + %d = %d\n", a, b, aplica_operatie(a, b, aduna));
+    printf("%d - %d = %d\n", a, b, aplica_operatie(a, b, scade));
+    printf("%d * %d = %d\n", a, b, aplica_operatie(a, b, inmulteste));
+    printf("%d / %d = %d\n", a, b, aplica_operatie(a, b, imparte));
+    
+    return 0;
+}</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>Ieșire:</strong> 20 + 5 = 25 | 20 - 5 = 15 | 20 * 5 = 100 | 20 / 5 = 4
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 13: ARRAY DE POINTERI (DISPATCH TABLE) ==================== -->
+        <div class="slide" data-slide="13">
+            <h2 class="slide-title"><span class="emoji">📚</span> Array de Pointeri la Funcții (Dispatch Table)</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Calculator folosind dispatch table</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int aduna(int a, int b) { return a + b; }
+int scade(int a, int b) { return a - b; }
+int inmulteste(int a, int b) { return a * b; }
+int imparte(int a, int b) { return b ? a / b : 0; }
+
+int main() {
+    // Dispatch table: array de pointeri la funcții
+    int (*operatii[])(int, int) = {aduna, scade, inmulteste, imparte};
+    char simboluri[] = {'+', '-', '*', '/'};
+    
+    int a = 12, b = 4;
+    
+    // Iterează prin toate operațiile
+    for (int i = 0; i < 4; i++) {
+        printf("%d %c %d = %d\n", a, simboluri[i], b, operatii[i](a, b));
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+            <div class="highlight-box">
+                <strong>Caz de Utilizare:</strong> Dispatch tables sunt perfecte pentru implementarea mașinilor de stări, procesoare de comenzi și sisteme de meniu. Înlocuiesc instrucțiunile switch lungi cu căutări elegante în tabel.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 14: INTRODUCERE QSORT ==================== -->
+        <div class="slide" data-slide="14">
+            <h2 class="slide-title"><span class="emoji">📊</span> Funcția qsort()</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Semnătura (din stdlib.h)</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Prototipul funcției</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">void qsort(
+    void *base,      // Array de sortat
+    size_t nmemb,    // Număr de elemente
+    size_t size,     // Dimensiunea fiecărui element
+    int (*compar)(   // Callback comparator
+        const void *,
+        const void *
+    )
+);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Parametrii Explicați</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Parametru</th>
+                            <th>Descriere</th>
+                        </tr>
+                        <tr>
+                            <td><code>base</code></td>
+                            <td>Pointer la primul element</td>
+                        </tr>
+                        <tr>
+                            <td><code>nmemb</code></td>
+                            <td>Numărul de elemente de sortat</td>
+                        </tr>
+                        <tr>
+                            <td><code>size</code></td>
+                            <td>sizeof(element)</td>
+                        </tr>
+                        <tr>
+                            <td><code>compar</code></td>
+                            <td>Funcția ta de comparare</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 15: REGULILE COMPARATORULUI ==================== -->
+        <div class="slide" data-slide="15">
+            <h2 class="slide-title"><span class="emoji">⚖️</span> Regulile Comparatorului (Standard POSIX)</h2>
+            <div class="content-grid">
+                <div class="content-box full-width">
+                    <h3>Contractul Valorii de Return</h3>
+                    <div class="memory-diagram" style="justify-content: center; margin: 30px 0;">
+                        <div class="memory-cell" style="background: rgba(248, 81, 73, 0.2); min-width: 150px;">
+                            <div class="value" style="color: var(--accent-red);">< 0</div>
+                            <div class="name">a vine ÎNAINTE de b</div>
+                        </div>
+                        <div class="memory-cell" style="background: rgba(210, 153, 34, 0.2); min-width: 150px;">
+                            <div class="value" style="color: var(--accent-orange);">= 0</div>
+                            <div class="name">a EGAL cu b</div>
+                        </div>
+                        <div class="memory-cell" style="background: rgba(63, 185, 80, 0.2); min-width: 150px;">
+                            <div class="value" style="color: var(--accent-green);">> 0</div>
+                            <div class="name">a vine DUPĂ b</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Comparator Simplu pentru Întregi</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Ordine crescătoare</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int cmp_int_cresc(const void *a, 
+                  const void *b) {
+    int ia = *(const int*)a;
+    int ib = *(const int*)b;
+    return ia - ib;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Ordine Descrescătoare</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Inversează scăderea</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int cmp_int_desc(const void *a, 
+                 const void *b) {
+    int ia = *(const int*)a;
+    int ib = *(const int*)b;
+    return ib - ia;  // Inversat!
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="warning-box">
+                <strong>⚠️ Atenție la Overflow:</strong> Pentru întregi foarte mari, <code>a - b</code> poate face overflow! Folosește comparație condițională pentru siguranță.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 16: COMPARATOR SIGUR ==================== -->
+        <div class="slide" data-slide="16">
+            <h2 class="slide-title"><span class="emoji">🛡️</span> Comparator Sigur pentru Întregi</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Problema</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Exemplu de overflow</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int a = INT_MAX;  // 2147483647
+int b = -1;
+
+// a - b face overflow!
+// 2147483647 - (-1) = 2147483648
+// Dar INT_MAX = 2147483647
+// Rezultatul devine negativ!</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Soluția</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Comparator sigur</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int cmp_int_sigur(const void *a, 
+                  const void *b) {
+    int ia = *(const int*)a;
+    int ib = *(const int*)b;
+    
+    // Folosește condiții în loc de scădere
+    if (ia < ib) return -1;
+    if (ia > ib) return 1;
+    return 0;
+    
+    // Sau forma elegantă:
+    // return (ia > ib) - (ia < ib);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="success-box">
+                <strong>Bună Practică:</strong> Folosește întotdeauna forma condițională când lucrezi cu numere potențial mari sau când compari valori cu semn.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 17: QSORT CU ÎNTREGI ==================== -->
+        <div class="slide" data-slide="17">
+            <h2 class="slide-title"><span class="emoji">🔢</span> qsort() cu Întregi</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Exemplu complet funcțional</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int cmp_cresc(const void *a, const void *b) {
+    return (*(int*)a > *(int*)b) - (*(int*)a < *(int*)b);
+}
+
+void afiseaza_vector(int arr[], int n) {
+    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    
+    printf("Original: ");
+    afiseaza_vector(arr, n);
+    
+    qsort(arr, n, sizeof(int), cmp_cresc);
+    
+    printf("Sortat:   ");
+    afiseaza_vector(arr, n);
+    
+    return 0;
+}</code></pre>
+            </div>
+            <div class="highlight-box">
+                <strong>Ieșire:</strong><br>
+                Original: 64 34 25 12 22 11 90<br>
+                Sortat:   11 12 22 25 34 64 90
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 18: QSORT CU STRUCTURI ==================== -->
+        <div class="slide" data-slide="18">
+            <h2 class="slide-title"><span class="emoji">🏗️</span> qsort() cu Structuri</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Sortarea studenților după notă</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+typedef struct {
+    int id;
+    char nume[50];
+    float nota;
+} Student;
+
+// Compară după notă (descrescător - cea mai mare prima)
+int cmp_dupa_nota(const void *a, const void *b) {
+    const Student *s1 = (const Student*)a;
+    const Student *s2 = (const Student*)b;
+    
+    // Pentru float, folosește comparație condițională
+    if (s2->nota > s1->nota) return 1;
+    if (s2->nota < s1->nota) return -1;
+    return 0;
+}
+
+// Compară după nume (alfabetic)
+int cmp_dupa_nume(const void *a, const void *b) {
+    const Student *s1 = (const Student*)a;
+    const Student *s2 = (const Student*)b;
+    return strcmp(s1->nume, s2->nume);
+}</code></pre>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 19: QSORT STRUCTURI CONTINUARE ==================== -->
+        <div class="slide" data-slide="19">
+            <h2 class="slide-title"><span class="emoji">🏗️</span> qsort() cu Structuri (continuare)</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Utilizarea comparatorilor</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">int main() {
+    Student studenti[] = {
+        {103, "Popescu Ion", 8.5},
+        {101, "Ionescu Maria", 9.2},
+        {105, "Georgescu Ana", 7.8},
+        {102, "Vasilescu Dan", 9.5}
+    };
+    int n = sizeof(studenti) / sizeof(studenti[0]);
+    
+    // Sortează după notă (cea mai mare prima)
+    qsort(studenti, n, sizeof(Student), cmp_dupa_nota);
+    
+    printf("Top Studenți:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d. %s - %.2f\n", 
+               i + 1, studenti[i].nume, studenti[i].nota);
+    }
+    
+    return 0;
+}</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>Ieșire:</strong><br>
+                1. Vasilescu Dan - 9.50<br>
+                2. Ionescu Maria - 9.20<br>
+                3. Popescu Ion - 8.50<br>
+                4. Georgescu Ana - 7.80
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 20: INTRODUCERE BSEARCH ==================== -->
+        <div class="slide" data-slide="20">
+            <h2 class="slide-title"><span class="emoji">🔍</span> Funcția bsearch()</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Semnătura (din stdlib.h)</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Prototipul funcției</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">void *bsearch(
+    const void *key,  // Ce să găsească
+    const void *base, // Array sortat
+    size_t nmemb,     // Număr elemente
+    size_t size,      // Dimensiune element
+    int (*compar)(    // Același comparator!
+        const void *,
+        const void *
+    )
+);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Diferențe Cheie față de qsort()</h3>
+                    <ul>
+                        <li>Primul parametru este <strong>cheia de căutare</strong></li>
+                        <li>Returnează pointer la elementul găsit sau <strong>NULL</strong></li>
+                        <li>Array-ul <strong>TREBUIE să fie sortat</strong> înainte!</li>
+                        <li>Folosește același tip de funcție comparator</li>
+                    </ul>
+                    <div class="warning-box" style="margin-top: 15px;">
+                        <strong>Critic:</strong> În comparator, primul argument este întotdeauna CHEIA, al doilea este elementul din array!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 21: COMPLEXITATEA ALGORITMILOR ==================== -->
+        <div class="slide" data-slide="21">
+            <h2 class="slide-title"><span class="emoji">⏱️</span> Complexitatea Algoritmilor</h2>
+            <div class="content-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="complexity-card">
+                    <div class="big-o">O(n log n)</div>
+                    <div class="label">qsort() Mediu</div>
+                </div>
+                <div class="complexity-card">
+                    <div class="big-o">O(n²)</div>
+                    <div class="label">qsort() Cel mai rău</div>
+                </div>
+                <div class="complexity-card">
+                    <div class="big-o">O(log n)</div>
+                    <div class="label">bsearch()</div>
+                </div>
+            </div>
+            <div class="content-grid" style="margin-top: 30px;">
+                <div class="content-box">
+                    <h3>Implementare qsort()</h3>
+                    <ul>
+                        <li>De obicei QuickSort sau hibrid</li>
+                        <li>Mediu: O(n log n)</li>
+                        <li>Cel mai rău caz: O(n²) pentru pivoți proști</li>
+                        <li>Spațiu: O(log n) pentru stiva de recursie</li>
+                        <li><strong>NU este stabilă</strong> - elementele egale se pot reordona</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Implementare bsearch()</h3>
+                    <ul>
+                        <li>Algoritm de căutare binară</li>
+                        <li>Întotdeauna: O(log n)</li>
+                        <li>Spațiu: O(1) constant</li>
+                        <li><strong>Necesită array sortat!</strong></li>
+                        <li>Returnează prima potrivire găsită (nu neapărat prima din array)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 22: EXEMPLU BSEARCH ==================== -->
+        <div class="slide" data-slide="22">
+            <h2 class="slide-title"><span class="emoji">💻</span> Exemplu Complet bsearch()</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Căutarea unui student după nume</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+typedef struct { int id; char nume[50]; float nota; } Student;
+
+// Comparator: cheia este un string (char*), elementul este Student
+int cmp_cauta_nume(const void *cheie, const void *elem) {
+    const char *nume_cautat = (const char*)cheie;
+    const Student *student = (const Student*)elem;
+    return strcmp(nume_cautat, student->nume);
+}
+
+int main() {
+    Student studenti[] = {
+        {101, "Georgescu Ana", 7.8},
+        {102, "Ionescu Maria", 9.2},
+        {103, "Popescu Ion", 8.5}  // Deja sortat după nume!
+    };
+    int n = sizeof(studenti) / sizeof(studenti[0]);
+    
+    char *de_gasit = "Ionescu Maria";
+    Student *gasit = bsearch(de_gasit, studenti, n, sizeof(Student), cmp_cauta_nume);
+    
+    if (gasit) {
+        printf("Găsit: %s (ID: %d, Nota: %.2f)\n", gasit->nume, gasit->id, gasit->nota);
+    } else {
+        printf("Studentul nu a fost găsit!\n");
+    }
+    return 0;
+}</code></pre>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 23: APLICAȚII INDUSTRIALE ==================== -->
+        <div class="slide" data-slide="23">
+            <h2 class="slide-title"><span class="emoji">🏭</span> Aplicații Industriale</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>GTK/GLib (Interfețe Linux)</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Gestionarea semnalelor</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// Conectează click pe buton la handler
+g_signal_connect(
+    buton,
+    "clicked",
+    G_CALLBACK(la_click_buton),
+    date_utilizator
+);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Win32 API (Windows)</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Procedura fereastră callback</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">LRESULT CALLBACK WndProc(
+    HWND hwnd, UINT msg,
+    WPARAM wParam, LPARAM lParam
+) {
+    switch (msg) {
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+    }
+    return DefWindowProc(...);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 24: MAI MULTE APLICAȚII ==================== -->
+        <div class="slide" data-slide="24">
+            <h2 class="slide-title"><span class="emoji">🏭</span> Mai Multe Aplicații Industriale</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Gestionarea Semnalelor Unix</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Gestionarea Ctrl+C</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">#include &lt;signal.h&gt;
+
+void gestioneaza_sigint(int sig) {
+    printf("Am prins semnalul %d\n", sig);
+    // Cod de curățare aici
+    exit(0);
+}
+
+int main() {
+    // Înregistrează callback pentru SIGINT
+    signal(SIGINT, gestioneaza_sigint);
+    
+    while(1) {
+        // Bucla principală a programului
+    }
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Node.js / libuv (Event Loop)</h3>
+                    <p>Întreaga buclă de evenimente Node.js este implementată în C folosind callback-uri:</p>
+                    <ul>
+                        <li>Operații I/O pe fișiere</li>
+                        <li>Socket-uri de rețea</li>
+                        <li>Timere și intervale</li>
+                        <li>Procese copil</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 15px;">
+                        <strong>Fapt Interesant:</strong> libuv gestionează ~1 milion de conexiuni simultane folosind I/O asincron bazat pe callback-uri!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 25: ÎNTREBARE INTERVIU 1 ==================== -->
+        <div class="slide" data-slide="25">
+            <h2 class="slide-title"><span class="emoji">💼</span> Întrebare de Interviu #1</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Întrebarea</h3>
+                    <p style="font-size: 1.1em; margin-bottom: 20px;">Declară un pointer la o funcție care primește doi întregi și returnează un întreg.</p>
+                    <div class="interactive-demo">
+                        <p style="margin-bottom: 15px;">Care este sintaxa corectă?</p>
+                        <div class="demo-controls">
+                            <button class="demo-btn" onclick="verificaRaspuns1(1)">int *func(int, int)</button>
+                            <button class="demo-btn" onclick="verificaRaspuns1(2)">int (*func)(int, int)</button>
+                            <button class="demo-btn" onclick="verificaRaspuns1(3)">int func*(int, int)</button>
+                        </div>
+                        <div id="raspuns1" class="demo-output" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Analiză</h3>
+                    <ul>
+                        <li><code>int *func(int, int)</code> — Funcție care returnează pointer la int</li>
+                        <li><code>int (*func)(int, int)</code> — Pointer la funcție ✓</li>
+                        <li><code>int func*(int, int)</code> — Eroare de sintaxă</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 20px;">
+                        <strong>Amintește-ți:</strong> Parantezele din jurul <code>*func</code> sunt esențiale pentru a face un pointer la funcție și nu o funcție care returnează pointer!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 26: ÎNTREBARE INTERVIU 2 ==================== -->
+        <div class="slide" data-slide="26">
+            <h2 class="slide-title"><span class="emoji">💼</span> Întrebare de Interviu #2</h2>
+            <div class="content-grid">
+                <div class="content-box full-width">
+                    <h3>Întrebarea</h3>
+                    <p>Implementează un dispatch table folosind un array de pointeri la funcții pentru un calculator simplu.</p>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Soluție</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">typedef int (*Operatie)(int, int);
+
+int aduna(int a, int b) { return a + b; }
+int scade(int a, int b) { return a - b; }
+int inmulteste(int a, int b) { return a * b; }
+int imparte(int a, int b) { return b ? a / b : 0; }
+
+int calculeaza(char op, int a, int b) {
+    // Mapează operatorii la indici
+    Operatie ops[256] = {0};  // Inițializează toate cu NULL
+    ops['+'] = aduna;
+    ops['-'] = scade;
+    ops['*'] = inmulteste;
+    ops['/'] = imparte;
+    
+    if (ops[(unsigned char)op]) {
+        return ops[(unsigned char)op](a, b);
+    }
+    return 0;  // Operator necunoscut
+}</code></pre>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 27: ÎNTREBARE INTERVIU 3 ==================== -->
+        <div class="slide" data-slide="27">
+            <h2 class="slide-title"><span class="emoji">💼</span> Întrebare de Interviu #3</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Întrebarea</h3>
+                    <p>Explică diferența între:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Două declarații</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int (*fptr)(int);
+
+int *fptr(int);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Răspuns</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Declarație</th>
+                            <th>Semnificație</th>
+                        </tr>
+                        <tr>
+                            <td><code>int (*fptr)(int)</code></td>
+                            <td>Pointer la o funcție care primește int și returnează int</td>
+                        </tr>
+                        <tr>
+                            <td><code>int *fptr(int)</code></td>
+                            <td>Funcție care primește int și returnează pointer la int</td>
+                        </tr>
+                    </table>
+                    <div class="warning-box" style="margin-top: 15px;">
+                        <strong>Idee Cheie:</strong> Parantezele leagă * de fptr, făcându-l pointer. Fără ele, * se leagă de tipul de return.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 28: GREȘELI COMUNE ==================== -->
+        <div class="slide" data-slide="28">
+            <h2 class="slide-title"><span class="emoji">⚠️</span> Greșeli Comune</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>1. Uitarea Sortării înainte de bsearch()</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Greșit!</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// Array-ul nu e sortat!
+int arr[] = {5, 2, 8, 1};
+
+// bsearch va da rezultate greșite
+int *p = bsearch(&cheie, arr, 4, 
+                 sizeof(int), cmp);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>2. Comparator Greșit pentru bsearch()</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Amintește-ți!</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">// În comparatorul pentru bsearch:
+// Primul arg = CHEIA (ce căutăm)
+// Al doilea arg = element din array
+
+int cmp(const void *cheie, 
+        const void *elem) {
+    // cheie este ce căutăm
+    // elem este elementul curent
+}</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>3. Overflow la Întregi în Comparator</h3>
+                    <p>Folosește condiții, nu scădere:</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Pattern sigur</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">return (a > b) - (a < b);</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>4. Semnături de Funcții Nepotrivite</h3>
+                    <p>Tipul pointerului trebuie să corespundă EXACT semnăturii funcției. Avertismentele compilatorului sunt prietenii tăi!</p>
+                    <div class="warning-box" style="margin-top: 15px;">
+                        Nu ignora niciodată avertismentele despre tipuri de pointer incompatibile!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 29: MODELUL MEMORIEI ==================== -->
+        <div class="slide" data-slide="29">
+            <h2 class="slide-title"><span class="emoji">🧠</span> Modelul Memoriei: Pointeri la Funcții</h2>
+            <div class="content-box" style="max-width: 900px; margin: 0 auto;">
+                <h3 style="text-align: center; margin-bottom: 30px;">Unde Trăiește Codul în Memorie</h3>
+                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px;">
+                    <div style="text-align: right; padding-right: 20px; border-right: 3px solid var(--accent-blue);">
+                        <div style="margin-bottom: 40px;">
+                            <div style="color: var(--accent-purple); font-weight: bold;">Adresă Mare</div>
+                            <div style="color: var(--text-secondary);">0xFFFF...</div>
+                        </div>
+                        <div style="margin-bottom: 40px;">
+                            <div style="color: var(--text-secondary);">↓</div>
+                        </div>
+                        <div style="margin-bottom: 40px;">
+                            <div style="color: var(--text-secondary);">↓</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--accent-green); font-weight: bold;">Adresă Mică</div>
+                            <div style="color: var(--text-secondary);">0x0000...</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="memory-cell" style="margin-bottom: 10px; background: rgba(248, 81, 73, 0.2);">
+                            <div class="value" style="color: var(--accent-red);">Stack</div>
+                            <div class="name">Variabile locale, parametri, adrese de return</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px;">↕ crește/scade</div>
+                        <div class="memory-cell" style="margin-bottom: 10px; background: rgba(163, 113, 247, 0.2);">
+                            <div class="value" style="color: var(--accent-purple);">Heap</div>
+                            <div class="name">malloc(), alocare dinamică</div>
+                        </div>
+                        <div class="memory-cell" style="margin-bottom: 10px; background: rgba(210, 153, 34, 0.2);">
+                            <div class="value" style="color: var(--accent-orange);">Segment Date</div>
+                            <div class="name">Variabile globale/statice (BSS + date inițializate)</div>
+                        </div>
+                        <div class="memory-cell" style="background: rgba(63, 185, 80, 0.2);">
+                            <div class="value" style="color: var(--accent-green);">Segment Text (Cod)</div>
+                            <div class="name">Instrucțiuni executabile - CODUL FUNCȚIILOR E AICI!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box" style="max-width: 900px; margin: 20px auto 0;">
+                <strong>Idee Cheie:</strong> Pointerii la funcții stochează adrese care indică spre segmentul Text. Codul în sine este read-only și partajat între toate instanțele unui program.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 30: SFATURI DE DEBUGGING ==================== -->
+        <div class="slide" data-slide="30">
+            <h2 class="slide-title"><span class="emoji">🐛</span> Debugging pentru Pointeri la Funcții</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Comenzi GDB</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Comenzi GDB utile</span>
+                            <span class="lang-badge">BASH</span>
+                        </div>
+                        <pre><code class="language-bash"># Afișează valoarea pointerului la funcție
+(gdb) p fptr
+$1 = (int (*)(int, int)) 0x4005f0 &lt;aduna&gt;
+
+# Afișează spre ce funcție indică
+(gdb) p *fptr
+$2 = {int (int, int)} 0x4005f0 &lt;aduna&gt;
+
+# Setează breakpoint pe pointerul la funcție
+(gdb) b *fptr
+
+# Intră în apelul prin pointer
+(gdb) step</code></pre>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Pattern de Verificare</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Verifică întotdeauna înainte de apel</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int apel_sigur(int (*fptr)(int, int),
+               int a, int b) {
+    // Verifică întotdeauna pentru NULL!
+    if (fptr == NULL) {
+        fprintf(stderr, 
+                "Eroare: Pointer la funcție NULL\n");
+        return -1;  // Sau gestionează corespunzător
+    }
+    
+    return fptr(a, b);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="warning-box">
+                <strong>Amintește-ți:</strong> Apelarea unui pointer la funcție NULL cauzează segmentation fault. Validează întotdeauna pointerii înainte de utilizare!
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 31: BUNE PRACTICI ==================== -->
+        <div class="slide" data-slide="31">
+            <h2 class="slide-title"><span class="emoji">✅</span> Rezumat Bune Practici</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Fă:</h3>
+                    <ul>
+                        <li>Folosește <code>typedef</code> pentru tipuri de pointeri la funcții</li>
+                        <li>Verifică pentru NULL înainte de apel</li>
+                        <li>Folosește pattern-uri sigure de comparator (fără overflow)</li>
+                        <li>Sortează array-urile înainte de bsearch()</li>
+                        <li>Potrivește comparatorul cu criteriul de sortare</li>
+                        <li>Documentează contractele callback-urilor clar</li>
+                        <li>Folosește nume descriptive pentru pointerii la funcții</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Nu fă:</h3>
+                    <ul>
+                        <li>Nu ignora avertismentele compilatorului despre tipuri de pointer</li>
+                        <li>Nu folosi scăderea pentru compararea întregilor mari</li>
+                        <li>Nu uita parantezele în declarații</li>
+                        <li>Nu presupune că qsort() este stabilă</li>
+                        <li>Nu fă cast la pointeri la funcții la tipuri incompatibile</li>
+                        <li>Nu apela bsearch() pe array-uri nesortate</li>
+                        <li>Nu încurca cheia și elementul în comparatorul bsearch</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 32: PREVIZUALIZARE EXERCIȚII ==================== -->
+        <div class="slide" data-slide="32">
+            <h2 class="slide-title"><span class="emoji">📝</span> Exerciții de Laborator</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Exercițiul 1: Calculator cu Callbacks</h3>
+                    <p>Implementează un calculator care:</p>
+                    <ul>
+                        <li>Citește operația (+, -, *, /, %) de la utilizator</li>
+                        <li>Folosește un dispatch table de pointeri la funcții</li>
+                        <li>Gestionează împărțirea la zero cu grație</li>
+                        <li>Suportă operația modulo</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 15px;">
+                        <strong>Dificultate:</strong> ⭐⭐☆☆☆
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Exercițiul 2: Bază de Date Studenți</h3>
+                    <p>Creează un sistem de gestiune studenți cu:</p>
+                    <ul>
+                        <li>Sortare după nume, ID sau notă</li>
+                        <li>Căutare după nume folosind bsearch()</li>
+                        <li>Filtrare studenți peste un prag</li>
+                        <li>Comparatoare personalizate pentru fiecare criteriu</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top: 15px;">
+                        <strong>Dificultate:</strong> ⭐⭐⭐☆☆
+                    </div>
+                </div>
+            </div>
+            <div class="success-box" style="margin-top: 20px;">
+                <strong>Fișiere Laborator:</strong> Verifică <code>src/exercise1.c</code> și <code>src/exercise2.c</code> pentru șabloane de start cu marcaje TODO.
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 33: IDEI CHEIE ==================== -->
+        <div class="slide" data-slide="33">
+            <h2 class="slide-title"><span class="emoji">🎯</span> Idei Cheie</h2>
+            <div class="content-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">1. Sintaxa Contează</div>
+                    <div class="name"><code>int (*fp)(int)</code> ≠ <code>int *fp(int)</code></div>
+                </div>
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">2. Folosește typedef</div>
+                    <div class="name">Face codul lizibil și ușor de întreținut</div>
+                </div>
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">3. Callback-urile Permit Genericitate</div>
+                    <div class="name">Scrie o dată, personalizează comportamentul</div>
+                </div>
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">4. qsort() Este Puternic</div>
+                    <div class="name">Sortează orice tip de date cu comparatoare personalizate</div>
+                </div>
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">5. bsearch() Necesită Date Sortate</div>
+                    <div class="name">Sortează întotdeauna întâi, căutare O(log n)</div>
+                </div>
+                <div class="memory-cell" style="text-align: left; padding: 25px;">
+                    <div class="value" style="font-size: 1.2em; margin-bottom: 10px;">6. Dispatch Tables</div>
+                    <div class="name">Înlocuiește switch cu eleganță</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 34: RESURSE ==================== -->
+        <div class="slide" data-slide="34">
+            <h2 class="slide-title"><span class="emoji">📚</span> Resurse Adiționale</h2>
+            <div class="content-grid">
+                <div class="content-box">
+                    <h3>Lectură Esențială</h3>
+                    <ul>
+                        <li><strong>K&R</strong> - Capitol 5.11: Pointeri la Funcții</li>
+                        <li><strong>Modern C</strong> - Capitol 11: Pointeri la Funcții</li>
+                        <li><strong>CLRS</strong> - Teoria algoritmilor de sortare</li>
+                        <li><strong>man qsort</strong> - Documentație sistem</li>
+                        <li><strong>man bsearch</strong> - Documentație căutare binară</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Resurse Online</h3>
+                    <ul>
+                        <li>cppreference.com - Biblioteca standard C</li>
+                        <li>cdecl.org - Decodează declarații C</li>
+                        <li>Compiler Explorer (godbolt.org) - Vezi asamblarea</li>
+                        <li>Stack Overflow - Exemple practice</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="quote-box">
+                „Singura modalitate de a învăța un nou limbaj de programare este scriind programe în el."
+                <div class="quote-author">— Dennis Ritchie</div>
+            </div>
+        </div>
+        
+        <!-- ==================== SLIDE 35: MULȚUMESC ==================== -->
+        <div class="slide title-slide" data-slide="35">
+            <h1>🎉 Întrebări?</h1>
+            <p class="subtitle">Săptămâna 01: Pointeri la Funcții și Callbacks</p>
+            <div style="margin-top: 30px;">
+                <p style="color: var(--text-secondary);">Săptămâna viitoare: Fișiere Text în C</p>
+            </div>
+            <div style="margin-top: 40px; display: flex; justify-content: center; gap: 30px;">
+                <div class="memory-cell">
+                    <div class="value">📧</div>
+                    <div class="name">Contactează profesorul</div>
+                </div>
+                <div class="memory-cell">
+                    <div class="value">💻</div>
+                    <div class="name">Exersează exercițiile</div>
+                </div>
+                <div class="memory-cell">
+                    <div class="value">📖</div>
+                    <div class="name">Citește K&R Cap. 5.11</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controale Navigare -->
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="slidAnterior()">← Anterior</button>
+            <button class="nav-btn" onclick="slidUrmator()">Următor →</button>
+        </div>
+        
+        <div class="slide-counter">
+            Slide <span id="currentSlide">1</span> / <span id="totalSlides">35</span>
+        </div>
+    </div>
+    
+    <script>
+        // Inițializează highlight.js
+        hljs.highlightAll();
+        
+        let slidCurent = 1;
+        const totalSliduri = document.querySelectorAll('.slide').length;
+        
+        document.getElementById('totalSlides').textContent = totalSliduri;
+        
+        function arataSlid(n) {
+            const sliduri = document.querySelectorAll('.slide');
+            
+            if (n > totalSliduri) slidCurent = 1;
+            if (n < 1) slidCurent = totalSliduri;
+            
+            sliduri.forEach(slid => slid.classList.remove('active'));
+            sliduri[slidCurent - 1].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = slidCurent;
+            document.getElementById('progressFill').style.width = 
+                ((slidCurent / totalSliduri) * 100) + '%';
+        }
+        
+        function slidUrmator() {
+            slidCurent++;
+            arataSlid(slidCurent);
+        }
+        
+        function slidAnterior() {
+            slidCurent--;
+            arataSlid(slidCurent);
+        }
+        
+        // Navigare cu tastatura
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                slidUrmator();
+            } else if (e.key === 'ArrowLeft') {
+                slidAnterior();
+            } else if (e.key === 'Home') {
+                slidCurent = 1;
+                arataSlid(slidCurent);
+            } else if (e.key === 'End') {
+                slidCurent = totalSliduri;
+                arataSlid(slidCurent);
+            }
+        });
+        
+        // Funcții demo interactive
+        function verificaRaspuns1(alegere) {
+            const output = document.getElementById('raspuns1');
+            const butoane = document.querySelectorAll('#raspuns1').closest('.interactive-demo').querySelectorAll('.demo-btn');
+            
+            butoane.forEach(btn => btn.classList.remove('active'));
+            
+            if (alegere === 2) {
+                output.innerHTML = '<span style="color: var(--accent-green)">✓ Corect!</span> <code>int (*func)(int, int)</code> declară un pointer la funcție.';
+                butoane[1].classList.add('active');
+            } else {
+                output.innerHTML = '<span style="color: var(--accent-red)">✗ Încearcă din nou.</span> Amintește-ți: parantezele din jurul *func sunt obligatorii!';
+            }
+        }
+        
+        // Inițializează primul slide
+        arataSlid(1);
+    </script>
+</body>
+</html>

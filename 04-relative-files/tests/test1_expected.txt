@@ -1,0 +1,35 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     EXERCIȚIUL 1: Lista de Studenți                           ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Citire studenți (format: ID Nume Media)...
+
+Lista studenților:
+─────────────────────────────────────────────────
+  ID: 201, Nume: Test_Student_A, Medie: 8.00
+  ID: 202, Nume: Test_Student_B, Medie: 9.00
+  ID: 203, Nume: Test_Student_C, Medie: 7.50
+─────────────────────────────────────────────────
+Total: 3 studenți
+
+Statistici:
+  Media generală: 8.17
+  Studenți cu media >= 8.0: 2
+  Studenți cu media >= 9.0: 1
+
+Testare căutare:
+  Studentul cu ID 102 nu a fost găsit.
+
+Testare ștergere:
+  Studentul cu ID 102 nu a fost găsit.
+
+Lista după ștergere:
+Lista studenților:
+─────────────────────────────────────────────────
+  ID: 201, Nume: Test_Student_A, Medie: 8.00
+  ID: 202, Nume: Test_Student_B, Medie: 9.00
+  ID: 203, Nume: Test_Student_C, Medie: 7.50
+─────────────────────────────────────────────────
+Total: 3 studenți
+
+✓ Memoria a fost eliberată.

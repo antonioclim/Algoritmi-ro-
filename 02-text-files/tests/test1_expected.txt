@@ -1,0 +1,17 @@
+=== RAPORT NOTE STUDENȚI ===
+
+Nr. | ID      | Nume              | Grupa | Media | Status
+----+---------+-------------------+-------+-------+------------
+1   | 1002    | Ionescu Maria     | 1051  | 9.70  | PROMOVAT
+2   | 1001    | Popescu Ion       | 1050  | 8.50  | PROMOVAT
+3   | 1004    | Dumitrescu Ana    | 1051  | 7.50  | PROMOVAT
+4   | 1003    | Georgescu Andrei  | 1050  | 5.30  | PROMOVAT
+5   | 1005    | Stanescu Mihai    | 1050  | 3.90  | NEPROMOVAT
+
+=== STATISTICI ===
+Total studenți: 5
+Promovați: 4 (80.0%)
+Nepromovați: 1 (20.0%)
+Media generală: 6.98
+Nota minimă: 3.90
+Nota maximă: 9.70

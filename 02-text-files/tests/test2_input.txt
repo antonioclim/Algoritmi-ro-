@@ -1,0 +1,17 @@
+# Test Configuration File
+
+[Settings]
+name = TestApp
+version = 2.0
+enabled = true
+
+[Numbers]
+integer_value = 42
+float_value = 3.14159
+negative = -100
+
+[Booleans]
+flag1 = true
+flag2 = false
+flag3 = yes
+flag4 = no

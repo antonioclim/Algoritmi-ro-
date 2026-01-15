@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparație: Pseudocode | C | Python - Fișiere Binare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s ease; z-index: 1000;
+        }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 50px 60px; display: none; opacity: 0;
+            transition: opacity 0.4s ease; overflow-y: auto;
+        }
+        .slide.active { display: flex; flex-direction: column; opacity: 1; }
+        .slide.title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+        }
+        h1 {
+            font-size: 3rem; font-weight: 700; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            font-size: 1.8rem; font-weight: 600; margin-bottom: 1rem;
+            color: var(--accent-blue); border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        .subtitle { font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+        
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex: 1;
+        }
+        .column {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .column h3 {
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .column.pseudocod h3 { color: var(--accent-purple); }
+        .column.c-lang h3 { color: var(--accent-blue); }
+        .column.python h3 { color: var(--accent-green); }
+        
+        .column pre {
+            margin: 0;
+            padding: 1rem;
+            flex: 1;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Fira Code', Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .nav-container { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .nav-btn {
+            width: 50px; height: 50px; border: none; border-radius: 50%;
+            background: var(--bg-secondary); color: var(--text-primary);
+            font-size: 1.2rem; cursor: pointer; transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        .nav-btn:hover { background: var(--accent-blue); color: var(--bg-primary); }
+        .slide-counter {
+            position: fixed; bottom: 20px; left: 20px; font-size: 1rem;
+            color: var(--text-secondary); background: var(--bg-secondary);
+            padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color);
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-tertiary); color: var(--accent-blue); }
+        tr:nth-child(even) { background: var(--bg-secondary); }
+        
+        .info-box {
+            padding: 1rem; border-radius: 8px; margin: 1rem 0;
+            border-left: 4px solid var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+        
+        kbd {
+            background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px;
+            border: 1px solid var(--border-color); font-family: monospace;
+        }
+        
+        @media (max-width: 1200px) {
+            .three-columns { grid-template-columns: 1fr; }
+            .slide { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active" data-slide="1">
+            <h1>Comparație Limbaje</h1>
+            <p class="subtitle">Fișiere Binare: Pseudocode | C | Python</p>
+            <p style="color: var(--text-secondary); margin-top: 2rem;">
+                Navigare: <kbd>←</kbd> <kbd>→</kbd> sau <kbd>Space</kbd>
+            </p>
+        </div>
+
+        <!-- Slide 2: Why Compare -->
+        <div class="slide content-slide" data-slide="2">
+            <h2>🤔 De ce comparăm limbajele?</h2>
+            <div class="info-box">
+                <p>Înțelegerea aceluiași concept în mai multe limbaje:</p>
+                <ul style="margin: 1rem 0 0 1.5rem;">
+                    <li><strong>Pseudocode</strong> - exprimă algoritmul independent de sintaxă</li>
+                    <li><strong>C</strong> - control low-level, performanță maximă</li>
+                    <li><strong>Python</strong> - sintaxă simplă, biblioteci puternice</li>
+                </ul>
+            </div>
+            <table style="margin-top: 1rem;">
+                <tr><th>Aspect</th><th>C</th><th>Python</th></tr>
+                <tr><td>Nivel abstractizare</td><td>Low-level</td><td>High-level</td></tr>
+                <tr><td>Gestionare memorie</td><td>Manuală</td><td>Automată</td></tr>
+                <tr><td>Performanță I/O</td><td>Maximă</td><td>Bună</td></tr>
+                <tr><td>Ușurință utilizare</td><td>Complexă</td><td>Simplă</td></tr>
+            </table>
+        </div>
+
+        <!-- Slide 3: Basic Read/Write -->
+        <div class="slide content-slide" data-slide="3">
+            <h2>📖 Citire/Scriere de Bază</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>ALGORITM ScrieNumar
+INTRARE: numar întreg
+IEȘIRE: fișier binar
+
+1. DESCHIDE fișier în mod scriere
+2. SCRIE bytes-ul numărului
+3. ÎNCHIDE fișier
+
+ALGORITM CiteșteNumar
+INTRARE: fișier binar
+IEȘIRE: numar întreg
+
+1. DESCHIDE fișier în mod citire
+2. CITEȘTE sizeof(int) bytes
+3. INTERPRETEAZĂ ca întreg
+4. ÎNCHIDE fișier
+5. RETURNEAZĂ numar</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">// Scriere
+int numar = 42;
+FILE *f = fopen("date.bin", "wb");
+fwrite(&numar, sizeof(int), 1, f);
+fclose(f);
+
+// Citire
+int numar_citit;
+FILE *f = fopen("date.bin", "rb");
+fread(&numar_citit, 
+      sizeof(int), 1, f);
+fclose(f);
+
+printf("%d\n", numar_citit);</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python"># Scriere
+import struct
+
+numar = 42
+with open("date.bin", "wb") as f:
+    f.write(struct.pack("i", numar))
+
+# Citire
+with open("date.bin", "rb") as f:
+    data = f.read(4)
+    numar_citit = struct.unpack(
+        "i", data)[0]
+
+print(numar_citit)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Structures -->
+        <div class="slide content-slide" data-slide="4">
+            <h2>🏗️ Serializare Structuri</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>STRUCTURĂ Student:
+    id: întreg
+    nume: șir[50]
+    medie: real
+
+PROCEDURĂ SalveazăStudent(s, fișier)
+    SCRIE s.id ca 4 bytes
+    SCRIE s.nume ca 50 bytes
+    SCRIE s.medie ca 4 bytes
+    
+FUNCȚIE CitișteStudent(fișier)
+    s.id ← CITEȘTE 4 bytes
+    s.nume ← CITEȘTE 50 bytes
+    s.medie ← CITEȘTE 4 bytes
+    RETURNEAZĂ s</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">#pragma pack(push, 1)
+typedef struct {
+    int id;
+    char nume[50];
+    float medie;
+} Student;
+#pragma pack(pop)
+
+// Salvare
+Student s = {1, "Ion", 9.5f};
+fwrite(&s, sizeof(Student), 1, f);
+
+// Citire
+Student s2;
+fread(&s2, sizeof(Student), 1, f);</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python">import struct
+
+# Format: int + 50 chars + float
+FMT = "i50sf"
+
+# Salvare
+student = (1, b"Ion".ljust(50, b'\0'), 
+           9.5)
+with open("s.bin", "wb") as f:
+    f.write(struct.pack(FMT, *student))
+
+# Citire
+with open("s.bin", "rb") as f:
+    data = f.read(struct.calcsize(FMT))
+    s = struct.unpack(FMT, data)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Seeking -->
+        <div class="slide content-slide" data-slide="5">
+            <h2>🎯 Poziționare (Seeking)</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>FUNCȚIE CiteșteÎnregistrare(f, index)
+    offset ← HEADER_SIZE + 
+             index × RECORD_SIZE
+    
+    POZIȚIONEAZĂ f la offset
+    record ← CITEȘTE RECORD_SIZE bytes
+    RETURNEAZĂ record
+
+FUNCȚIE DimensiuneFișier(f)
+    POZIȚIONEAZĂ f la sfârșit
+    dim ← POZIȚIE_CURENTĂ(f)
+    POZIȚIONEAZĂ f la început
+    RETURNEAZĂ dim</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">Record read_record(FILE *f, int idx) {
+    Record r;
+    long offset = sizeof(Header) + 
+                  idx * sizeof(Record);
+    fseek(f, offset, SEEK_SET);
+    fread(&r, sizeof(Record), 1, f);
+    return r;
+}
+
+long file_size(FILE *f) {
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    return size;
+}</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python">def read_record(f, idx, rec_size):
+    offset = HEADER_SIZE + idx * rec_size
+    f.seek(offset)
+    data = f.read(rec_size)
+    return struct.unpack(FMT, data)
+
+def file_size(f):
+    f.seek(0, 2)  # SEEK_END
+    size = f.tell()
+    f.seek(0)     # SEEK_SET
+    return size
+
+# Cu Path
+from pathlib import Path
+size = Path("file.bin").stat().st_size</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Array Operations -->
+        <div class="slide content-slide" data-slide="6">
+            <h2>📦 Operații cu Array-uri</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>PROCEDURĂ SalveazăArray(arr, n, f)
+    SCRIE n ca header
+    PENTRU i ← 0 LA n-1
+        SCRIE arr[i] ca bytes
+        
+FUNCȚIE CitișteArray(f)
+    n ← CITEȘTE header
+    arr ← ALOCĂ array de n elem
+    PENTRU i ← 0 LA n-1
+        arr[i] ← CITEȘTE element
+    RETURNEAZĂ arr, n</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">void save_array(int *arr, int n, 
+                FILE *f) {
+    fwrite(&n, sizeof(int), 1, f);
+    fwrite(arr, sizeof(int), n, f);
+}
+
+int* load_array(FILE *f, int *n) {
+    fread(n, sizeof(int), 1, f);
+    int *arr = malloc(*n * sizeof(int));
+    fread(arr, sizeof(int), *n, f);
+    return arr;
+}</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python">import array
+
+def save_array(arr, f):
+    # Salvează lungime + date
+    f.write(struct.pack("i", len(arr)))
+    arr.tofile(f)
+
+def load_array(f):
+    n = struct.unpack("i", f.read(4))[0]
+    arr = array.array('i')
+    arr.fromfile(f, n)
+    return arr
+
+# Cu numpy (mai eficient)
+import numpy as np
+arr = np.array([1,2,3], dtype=np.int32)
+arr.tofile("data.bin")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Error Handling -->
+        <div class="slide content-slide" data-slide="7">
+            <h2>⚠️ Gestionare Erori</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>FUNCȚIE DeschideSigur(numeFișier)
+    ÎNCEARCĂ:
+        f ← DESCHIDE numeFișier
+        DACĂ f este NULL:
+            ARUNCĂ EroareDeschidere
+        RETURNEAZĂ f
+    PRINDE eroare:
+        AFIȘEAZĂ mesaj eroare
+        RETURNEAZĂ NULL
+        
+ASIGURĂ-TE că f este închis</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">FILE* safe_open(const char *name) {
+    FILE *f = fopen(name, "rb");
+    if (f == NULL) {
+        perror("Eroare deschidere");
+        return NULL;
+    }
+    return f;
+}
+
+// Utilizare
+FILE *f = safe_open("date.bin");
+if (f) {
+    // operații...
+    fclose(f);
+}</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python">def safe_open(filename):
+    try:
+        return open(filename, "rb")
+    except FileNotFoundError:
+        print(f"Fișier negăsit: {filename}")
+        return None
+    except PermissionError:
+        print("Permisiuni insuficiente")
+        return None
+
+# Context manager (recomandat)
+try:
+    with open("date.bin", "rb") as f:
+        data = f.read()
+except IOError as e:
+    print(f"Eroare I/O: {e}")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Endianness -->
+        <div class="slide content-slide" data-slide="8">
+            <h2>🔄 Endianness</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>FUNCȚIE EsteSystemLittleEndian()
+    test ← 0x01020304
+    primul_byte ← ADRESĂ(test)[0]
+    RETURNEAZĂ primul_byte = 0x04
+
+FUNCȚIE ConverteLaBigEndian(val)
+    byte0 ← (val >> 24) & 0xFF
+    byte1 ← (val >> 16) & 0xFF
+    byte2 ← (val >> 8) & 0xFF
+    byte3 ← val & 0xFF
+    RETURNEAZĂ combină(byte3,2,1,0)</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code class="language-c">#include &lt;arpa/inet.h&gt;
+
+int is_little_endian(void) {
+    uint32_t t = 0x01020304;
+    return *(uint8_t*)&t == 0x04;
+}
+
+// Conversie network byte order
+uint32_t val = 12345;
+uint32_t net = htonl(val);  // to big
+uint32_t host = ntohl(net); // to host
+
+// Scriere portabilă
+fwrite(&net, sizeof(uint32_t), 1, f);</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code class="language-python">import sys
+import struct
+
+# Detectare
+is_little = sys.byteorder == 'little'
+
+# struct - control explicit
+# < = little-endian
+# > = big-endian
+# ! = network (big)
+
+val = 12345
+le = struct.pack("<i", val)  # little
+be = struct.pack(">i", val)  # big
+ne = struct.pack("!i", val)  # network
+
+# int.to_bytes / from_bytes
+data = val.to_bytes(4, 'big')
+val2 = int.from_bytes(data, 'big')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Comparison Table -->
+        <div class="slide content-slide" data-slide="9">
+            <h2>📊 Tabel Comparativ</h2>
+            <table>
+                <tr>
+                    <th>Caracteristică</th>
+                    <th>C</th>
+                    <th>Python</th>
+                </tr>
+                <tr>
+                    <td>Funcții de bază</td>
+                    <td>fread, fwrite, fseek, ftell</td>
+                    <td>read, write, seek, tell</td>
+                </tr>
+                <tr>
+                    <td>Serializare structuri</td>
+                    <td>Direct cu fread/fwrite</td>
+                    <td>struct.pack/unpack</td>
+                </tr>
+                <tr>
+                    <td>Control endianness</td>
+                    <td>htonl/ntohl sau manual</td>
+                    <td>Format strings (<, >)</td>
+                </tr>
+                <tr>
+                    <td>Gestionare erori</td>
+                    <td>Verificare return + perror</td>
+                    <td>Excepții + context manager</td>
+                </tr>
+                <tr>
+                    <td>Performanță</td>
+                    <td>Maximă</td>
+                    <td>Bună (cu numpy: foarte bună)</td>
+                </tr>
+                <tr>
+                    <td>Ușurință utilizare</td>
+                    <td>Complexă</td>
+                    <td>Simplă</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 10: When to Use -->
+        <div class="slide content-slide" data-slide="10">
+            <h2>🤔 Când să folosim fiecare?</h2>
+            <div class="three-columns">
+                <div class="column pseudocod">
+                    <h3>📝 Pseudocode</h3>
+                    <pre><code>FOLOSEȘTE pentru:
+
+✓ Documentare algoritmi
+✓ Design inițial
+✓ Comunicare în echipă
+✓ Prezentări academice
+✓ Independență de limbaj
+
+EVITĂ pentru:
+
+✗ Implementare directă
+✗ Testare performanță</code></pre>
+                </div>
+                <div class="column c-lang">
+                    <h3>⚙️ C</h3>
+                    <pre><code>FOLOSEȘTE pentru:
+
+✓ Sisteme embedded
+✓ Drivere, kernels
+✓ Performanță critică
+✓ Control hardware
+✓ Sisteme real-time
+
+EVITĂ pentru:
+
+✗ Prototipare rapidă
+✗ Scripts simple</code></pre>
+                </div>
+                <div class="column python">
+                    <h3>🐍 Python</h3>
+                    <pre><code>FOLOSEȘTE pentru:
+
+✓ Prototipare rapidă
+✓ Data science
+✓ Automatizare
+✓ Tool-uri de analiză
+✓ Procesare imagini
+
+EVITĂ pentru:
+
+✗ Timp real strict
+✗ Resurse limitate</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Key Insights -->
+        <div class="slide content-slide" data-slide="11">
+            <h2>💡 Concluzii</h2>
+            <div class="info-box">
+                <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">Conceptele sunt aceleași, sintaxa diferă!</h3>
+                <ul style="margin-left: 1.5rem;">
+                    <li><strong>Citire/Scriere</strong>: transfer bytes între memorie și fișier</li>
+                    <li><strong>Poziționare</strong>: navigare cu offset în fișier</li>
+                    <li><strong>Serializare</strong>: conversie structuri ↔ bytes</li>
+                    <li><strong>Endianness</strong>: ordinea bytes în reprezentare</li>
+                </ul>
+            </div>
+            <table style="margin-top: 1rem;">
+                <tr>
+                    <th>În C învățați</th>
+                    <th>Transferabil în Python</th>
+                </tr>
+                <tr><td>fread/fwrite</td><td>read/write + struct</td></tr>
+                <tr><td>fseek/ftell</td><td>seek/tell</td></tr>
+                <tr><td>sizeof + pragma pack</td><td>struct.calcsize + format</td></tr>
+                <tr><td>Gestionare manuală erori</td><td>Excepții</td></tr>
+            </table>
+        </div>
+
+        <!-- Slide 12: Thank You -->
+        <div class="slide title-slide" data-slide="12">
+            <h1>Mulțumesc!</h1>
+            <p class="subtitle">Întrebări despre comparația limbajelor?</p>
+            <p style="color: var(--text-secondary); margin-top: 2rem;">
+                Întoarceți-vă la prezentarea principală pentru detalii complete despre C.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="nav-container">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+        let currentSlide = 1;
+        const totalSlides = 12;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            const newSlide = document.querySelector(`[data-slide="${n}"]`);
+            if (newSlide) {
+                newSlide.classList.add('active');
+                currentSlide = n;
+                document.getElementById('currentSlide').textContent = currentSlide;
+                document.getElementById('progressBar').style.width = ((currentSlide-1)/(totalSlides-1))*100 + '%';
+            }
+        }
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+    </script>
+</body>
+</html>

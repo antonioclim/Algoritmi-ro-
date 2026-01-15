@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prezentare Comparativă: Pseudocod → C → Python | Săptămâna 01</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-green));
+            transition: width 0.3s ease;
+        }
+        
+        .slide {
+            display: none;
+            height: 100vh;
+            padding: 40px;
+            overflow-y: auto;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .slide.active { display: flex; flex-direction: column; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .slide-title {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: var(--accent-blue);
+            text-align: center;
+        }
+        
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .column {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .column h3 {
+            text-align: center;
+            padding: 10px;
+            margin: -20px -20px 15px -20px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .column.pseudocod h3 { background: var(--accent-orange); color: var(--bg-primary); }
+        .column.c-lang h3 { background: var(--accent-blue); color: var(--bg-primary); }
+        .column.python h3 { background: var(--accent-green); color: var(--bg-primary); }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .code-block pre {
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+        
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(163, 113, 247, 0.1));
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            padding: 12px;
+            text-align: left;
+            color: var(--accent-blue);
+        }
+        
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--bg-tertiary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .title-slide h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-box {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .feature-box .icon { font-size: 2em; margin-bottom: 10px; }
+        .feature-box h4 { color: var(--accent-blue); margin-bottom: 10px; }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .pros { border-left: 3px solid var(--accent-green); padding-left: 15px; }
+        .cons { border-left: 3px solid var(--accent-red); padding-left: 15px; }
+        
+        .kbd {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-family: monospace;
+        }
+        
+        @media (max-width: 1200px) {
+            .three-columns { grid-template-columns: 1fr; }
+            .slide { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- SLIDE 1: Titlu -->
+    <div class="slide active title-slide" data-slide="1">
+        <h1>🔄 Comparație: Pseudocod → C → Python</h1>
+        <p style="font-size: 1.3em; color: var(--text-secondary); margin-bottom: 30px;">
+            Pointeri la Funcții și Callbacks
+        </p>
+        <p style="color: var(--text-secondary);">Săptămâna 01 | Curs ATP</p>
+        <div style="margin-top: 40px;">
+            <span class="kbd">←</span> <span class="kbd">→</span> pentru navigare
+        </div>
+    </div>
+    
+    <!-- SLIDE 2: De ce comparăm -->
+    <div class="slide" data-slide="2">
+        <h2 class="slide-title">🤔 De Ce Comparăm Limbaje?</h2>
+        <div class="two-columns">
+            <div class="column">
+                <h3 style="background: var(--accent-purple); color: white;">Beneficii</h3>
+                <ul style="line-height: 2;">
+                    <li>Înțelegerea conceptelor <strong>fundamentale</strong> vs implementări specifice</li>
+                    <li>Recunoașterea <strong>pattern-urilor</strong> comune</li>
+                    <li>Aprecierea <strong>trade-off-urilor</strong> de design</li>
+                    <li>Facilitarea <strong>transferului de cunoștințe</strong></li>
+                    <li>Pregătire pentru <strong>interviuri tehnice</strong></li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 style="background: var(--accent-blue); color: white;">Ce Vom Compara</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div class="feature-box">
+                        <div class="icon">📝</div>
+                        <h4>Pseudocod</h4>
+                        <p style="font-size: 0.9em; color: var(--text-secondary);">Conceptul pur, fără sintaxă</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">⚙️</div>
+                        <h4>C</h4>
+                        <p style="font-size: 0.9em; color: var(--text-secondary);">Control explicit, performanță</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">🐍</div>
+                        <h4>Python</h4>
+                        <p style="font-size: 0.9em; color: var(--text-secondary);">Simplitate, expresivitate</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">🎯</div>
+                        <h4>Concepte</h4>
+                        <p style="font-size: 0.9em; color: var(--text-secondary);">Callbacks, sortare, căutare</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 3: Callback de Bază - Pseudocod -->
+    <div class="slide" data-slide="3">
+        <h2 class="slide-title">📞 Pattern Callback: Pseudocod</h2>
+        <div class="three-columns">
+            <div class="column pseudocod">
+                <h3>📝 Pseudocod</h3>
+                <div class="code-block">
+                    <pre><code>ALGORITM aplica_operatie
+  INTRARE: x, y, operatie
+  IEȘIRE: rezultat
+
+  rezultat ← APELEAZĂ operatie(x, y)
+  RETURNEAZĂ rezultat
+SFÂRȘIT
+
+// Utilizare:
+r1 ← aplica_operatie(5, 3, aduna)
+r2 ← aplica_operatie(5, 3, scade)</code></pre>
+                </div>
+                <div class="highlight-box">
+                    <strong>Conceptul:</strong> Transmitem o funcție ca parametru pentru a fi apelată mai târziu.
+                </div>
+            </div>
+            <div class="column c-lang">
+                <h3>⚙️ C</h3>
+                <div class="code-block">
+                    <pre><code class="language-c">int aplica_operatie(int x, int y, 
+    int (*operatie)(int, int)) {
+    return operatie(x, y);
+}
+
+int aduna(int a, int b) { 
+    return a + b; 
+}
+int scade(int a, int b) { 
+    return a - b; 
+}
+
+// Utilizare:
+int r1 = aplica_operatie(5, 3, aduna);
+int r2 = aplica_operatie(5, 3, scade);</code></pre>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Python</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">def aplica_operatie(x, y, operatie):
+    return operatie(x, y)
+
+def aduna(a, b):
+    return a + b
+
+def scade(a, b):
+    return a - b
+
+# Utilizare:
+r1 = aplica_operatie(5, 3, aduna)
+r2 = aplica_operatie(5, 3, scade)
+
+# Sau cu lambda:
+r3 = aplica_operatie(5, 3, lambda a, b: a * b)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 4: Sortare - Comparație -->
+    <div class="slide" data-slide="4">
+        <h2 class="slide-title">📊 Sortare cu Comparator Personalizat</h2>
+        <div class="three-columns">
+            <div class="column pseudocod">
+                <h3>📝 Pseudocod</h3>
+                <div class="code-block">
+                    <pre><code>ALGORITM sorteaza
+  INTRARE: lista, compara
+  
+  PENTRU fiecare pereche (a, b)
+    DACĂ compara(a, b) > 0
+      interschimbă(a, b)
+  RETURNEAZĂ lista
+
+// Comparatoare:
+compara_cresc(a, b):
+  DACĂ a < b RETURNEAZĂ -1
+  DACĂ a > b RETURNEAZĂ 1
+  RETURNEAZĂ 0</code></pre>
+                </div>
+            </div>
+            <div class="column c-lang">
+                <h3>⚙️ C (qsort)</h3>
+                <div class="code-block">
+                    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+
+int cmp_cresc(const void *a, 
+              const void *b) {
+    return *(int*)a - *(int*)b;
+}
+
+int cmp_desc(const void *a, 
+             const void *b) {
+    return *(int*)b - *(int*)a;
+}
+
+// Utilizare:
+int arr[] = {5, 2, 8, 1};
+qsort(arr, 4, sizeof(int), cmp_cresc);
+// arr = {1, 2, 5, 8}</code></pre>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Python (sorted/sort)</h3>
+                <div class="code-block">
+                    <pre><code class="language-python"># Folosind key function
+arr = [5, 2, 8, 1]
+
+# Crescător (implicit)
+sortat = sorted(arr)
+
+# Descrescător
+sortat = sorted(arr, reverse=True)
+
+# Cu cheie personalizată
+sortat = sorted(arr, key=abs)
+
+# Sau cu cmp_to_key
+from functools import cmp_to_key
+def cmp(a, b): return a - b
+sortat = sorted(arr, key=cmp_to_key(cmp))</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 5: Dispatch Table -->
+    <div class="slide" data-slide="5">
+        <h2 class="slide-title">📚 Dispatch Table</h2>
+        <div class="three-columns">
+            <div class="column pseudocod">
+                <h3>📝 Pseudocod</h3>
+                <div class="code-block">
+                    <pre><code>STRUCTURĂ operatii
+  '+' → funcție_adună
+  '-' → funcție_scade
+  '*' → funcție_înmulțește
+  '/' → funcție_împarte
+
+FUNCȚIE calculeaza(a, op, b)
+  DACĂ op EXISTĂ în operatii
+    RETURNEAZĂ operatii[op](a, b)
+  ALTFEL
+    eroare "Operator necunoscut"</code></pre>
+                </div>
+            </div>
+            <div class="column c-lang">
+                <h3>⚙️ C</h3>
+                <div class="code-block">
+                    <pre><code class="language-c">typedef int (*Op)(int, int);
+Op dispatch[256] = {NULL};
+
+void init() {
+    dispatch['+'] = aduna;
+    dispatch['-'] = scade;
+    dispatch['*'] = inmulteste;
+    dispatch['/'] = imparte;
+}
+
+int calc(int a, char op, int b) {
+    if (dispatch[(unsigned char)op])
+        return dispatch[op](a, b);
+    return 0;  // eroare
+}</code></pre>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Python</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">dispatch = {
+    '+': lambda a, b: a + b,
+    '-': lambda a, b: a - b,
+    '*': lambda a, b: a * b,
+    '/': lambda a, b: a // b if b else 0,
+}
+
+def calc(a, op, b):
+    if op in dispatch:
+        return dispatch[op](a, b)
+    raise ValueError(f"Operator necunoscut: {op}")
+
+# Sau cu operator module
+import operator
+ops = {'+': operator.add, '-': operator.sub}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 6: Căutare Binară -->
+    <div class="slide" data-slide="6">
+        <h2 class="slide-title">🔍 Căutare Binară</h2>
+        <div class="three-columns">
+            <div class="column pseudocod">
+                <h3>📝 Pseudocod</h3>
+                <div class="code-block">
+                    <pre><code>ALGORITM cauta_binar
+  INTRARE: lista_sortata, cheie, compara
+  
+  stanga ← 0
+  dreapta ← lungime(lista) - 1
+  
+  CÂT TIMP stanga ≤ dreapta
+    mijloc ← (stanga + dreapta) / 2
+    cmp ← compara(cheie, lista[mijloc])
+    
+    DACĂ cmp = 0: RETURNEAZĂ mijloc
+    DACĂ cmp < 0: dreapta ← mijloc - 1
+    ALTFEL: stanga ← mijloc + 1
+  
+  RETURNEAZĂ NEGĂSIT</code></pre>
+                </div>
+            </div>
+            <div class="column c-lang">
+                <h3>⚙️ C (bsearch)</h3>
+                <div class="code-block">
+                    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+
+int cmp(const void *cheie, 
+        const void *elem) {
+    return *(int*)cheie - *(int*)elem;
+}
+
+// Utilizare:
+int arr[] = {1, 3, 5, 7, 9};  // sortat!
+int cheie = 5;
+
+int *gasit = bsearch(&cheie, arr, 5, 
+                     sizeof(int), cmp);
+
+if (gasit) {
+    printf("Găsit: %d\n", *gasit);
+}</code></pre>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Python (bisect)</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">import bisect
+
+arr = [1, 3, 5, 7, 9]  # sortat!
+cheie = 5
+
+# Găsește indexul
+idx = bisect.bisect_left(arr, cheie)
+
+if idx < len(arr) and arr[idx] == cheie:
+    print(f"Găsit la indexul {idx}")
+else:
+    print("Nu a fost găsit")
+
+# Inserare menținând ordinea
+bisect.insort(arr, 6)
+# arr = [1, 3, 5, 6, 7, 9]</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 7: Funcții de Ordin Superior -->
+    <div class="slide" data-slide="7">
+        <h2 class="slide-title">🎯 Funcții de Ordin Superior: Map, Filter, Reduce</h2>
+        <div class="three-columns">
+            <div class="column pseudocod">
+                <h3>📝 Pseudocod</h3>
+                <div class="code-block">
+                    <pre><code>MAP(lista, f):
+  RETURNEAZĂ [f(x) pentru x în lista]
+
+FILTER(lista, predicat):
+  RETURNEAZĂ [x pentru x în lista 
+              DACĂ predicat(x)]
+
+REDUCE(lista, f, inițial):
+  acumulator ← inițial
+  PENTRU x în lista:
+    acumulator ← f(acumulator, x)
+  RETURNEAZĂ acumulator</code></pre>
+                </div>
+            </div>
+            <div class="column c-lang">
+                <h3>⚙️ C (manual)</h3>
+                <div class="code-block">
+                    <pre><code class="language-c">// Map
+void map_int(int *dest, int *src, int n,
+             int (*f)(int)) {
+    for (int i = 0; i < n; i++)
+        dest[i] = f(src[i]);
+}
+
+// Filter  
+int filter_int(int *dest, int *src, int n,
+               int (*pred)(int)) {
+    int k = 0;
+    for (int i = 0; i < n; i++)
+        if (pred(src[i])) dest[k++] = src[i];
+    return k;
+}
+
+// Reduce
+int reduce_int(int *arr, int n,
+               int (*f)(int, int), int init) {
+    int acc = init;
+    for (int i = 0; i < n; i++)
+        acc = f(acc, arr[i]);
+    return acc;
+}</code></pre>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Python (built-in)</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">from functools import reduce
+
+numere = [1, 2, 3, 4, 5]
+
+# Map
+patrate = list(map(lambda x: x**2, numere))
+# sau: [x**2 for x in numere]
+
+# Filter  
+pare = list(filter(lambda x: x % 2 == 0, numere))
+# sau: [x for x in numere if x % 2 == 0]
+
+# Reduce
+suma = reduce(lambda acc, x: acc + x, numere, 0)
+# sau: sum(numere)
+
+produs = reduce(lambda a, b: a * b, numere, 1)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 8: Tabel Comparativ -->
+    <div class="slide" data-slide="8">
+        <h2 class="slide-title">📋 Tabel Comparativ Complet</h2>
+        <table class="comparison-table" style="width: 100%;">
+            <tr>
+                <th>Aspect</th>
+                <th style="color: var(--accent-blue);">C</th>
+                <th style="color: var(--accent-green);">Python</th>
+            </tr>
+            <tr>
+                <td><strong>Sintaxa Function Pointer</strong></td>
+                <td><code>int (*fp)(int, int)</code></td>
+                <td>Nu e nevoie - funcțiile sunt first-class</td>
+            </tr>
+            <tr>
+                <td><strong>Declarare Callback</strong></td>
+                <td>Explicit cu typedef recomandat</td>
+                <td>Implicit - orice callable merge</td>
+            </tr>
+            <tr>
+                <td><strong>Sortare</strong></td>
+                <td><code>qsort(arr, n, size, cmp)</code></td>
+                <td><code>sorted(arr, key=func)</code></td>
+            </tr>
+            <tr>
+                <td><strong>Căutare Binară</strong></td>
+                <td><code>bsearch(key, arr, n, size, cmp)</code></td>
+                <td><code>bisect.bisect_left(arr, key)</code></td>
+            </tr>
+            <tr>
+                <td><strong>Funcții Lambda</strong></td>
+                <td>Nu există (doar funcții named)</td>
+                <td><code>lambda x: x * 2</code></td>
+            </tr>
+            <tr>
+                <td><strong>Closure</strong></td>
+                <td>Manual cu struct + void*</td>
+                <td>Native și automat</td>
+            </tr>
+            <tr>
+                <td><strong>Type Safety</strong></td>
+                <td>Static, verificat la compilare</td>
+                <td>Dinamic, verificat la runtime</td>
+            </tr>
+            <tr>
+                <td><strong>Performanță</strong></td>
+                <td>Maximă (no overhead)</td>
+                <td>Mai lentă (interpretare)</td>
+            </tr>
+            <tr>
+                <td><strong>Memorie Function Pointer</strong></td>
+                <td>8 bytes (pe 64-bit)</td>
+                <td>~136 bytes (obiect funcție)</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- SLIDE 9: Când să folosești ce -->
+    <div class="slide" data-slide="9">
+        <h2 class="slide-title">🎯 Când Să Folosești Ce?</h2>
+        <div class="two-columns">
+            <div class="column c-lang">
+                <h3>⚙️ Folosește C când...</h3>
+                <ul style="line-height: 2;">
+                    <li>✅ Performanța e critică (sisteme embedded, kernel)</li>
+                    <li>✅ Controlul memoriei e necesar</li>
+                    <li>✅ Interfațare cu hardware</li>
+                    <li>✅ Biblioteci de nivel scăzut</li>
+                    <li>✅ Resurse limitate (RAM, CPU)</li>
+                    <li>✅ Cod deterministic (real-time)</li>
+                </ul>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong style="color: var(--accent-green);">Pro:</strong>
+                        <p>Rapid, control total, footprint mic</p>
+                    </div>
+                    <div class="cons">
+                        <strong style="color: var(--accent-red);">Contra:</strong>
+                        <p>Verbos, prone la erori, debugging dificil</p>
+                    </div>
+                </div>
+            </div>
+            <div class="column python">
+                <h3>🐍 Folosește Python când...</h3>
+                <ul style="line-height: 2;">
+                    <li>✅ Dezvoltare rapidă e prioritară</li>
+                    <li>✅ Prototipare și scripting</li>
+                    <li>✅ Data science și ML</li>
+                    <li>✅ Automatizare și teste</li>
+                    <li>✅ Web development (backend)</li>
+                    <li>✅ Cod lizibil și mentenabil</li>
+                </ul>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong style="color: var(--accent-green);">Pro:</strong>
+                        <p>Rapid de scris, clar, ecosistem bogat</p>
+                    </div>
+                    <div class="cons">
+                        <strong style="color: var(--accent-red);">Contra:</strong>
+                        <p>Lent, consum mare de memorie, GIL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SLIDE 10: Idei Cheie -->
+    <div class="slide" data-slide="10">
+        <h2 class="slide-title">💡 Idei Cheie din Comparație</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
+            <div class="feature-box">
+                <div class="icon">🎯</div>
+                <h4>Conceptul e Universal</h4>
+                <p style="color: var(--text-secondary);">Callback-urile există în toate limbajele, doar sintaxa diferă.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">⚖️</div>
+                <h4>Trade-off-uri</h4>
+                <p style="color: var(--text-secondary);">C oferă control, Python oferă confort. Alege în funcție de context.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">🔄</div>
+                <h4>Transferabilitate</h4>
+                <p style="color: var(--text-secondary);">Înțelegând C, vei aprecia și înțelege mai bine Python (și invers).</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">📊</div>
+                <h4>qsort() ≈ sorted()</h4>
+                <p style="color: var(--text-secondary);">Ambele folosesc comparatoare, doar API-ul diferă.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">🔍</div>
+                <h4>bsearch() ≈ bisect</h4>
+                <p style="color: var(--text-secondary);">Căutare binară cu același principiu, sintaxă diferită.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">📚</div>
+                <h4>Dispatch Tables</h4>
+                <p style="color: var(--text-secondary);">Array în C, dicționar în Python - aceeași idee!</p>
+            </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 20px; text-align: center;">
+            <strong>Concluzie:</strong> Învață conceptele, nu doar sintaxa. Limbajele vin și pleacă, principiile rămân.
+        </div>
+    </div>
+    
+    <!-- SLIDE 11: Final -->
+    <div class="slide title-slide" data-slide="11">
+        <h1>🎉 Recapitulare Completă!</h1>
+        <p style="font-size: 1.2em; color: var(--text-secondary); margin: 20px 0;">
+            Ai învățat să compari implementări în 3 limbaje diferite
+        </p>
+        <div style="display: flex; gap: 30px; justify-content: center; margin-top: 30px;">
+            <div class="feature-box" style="min-width: 150px;">
+                <div class="icon">📝</div>
+                <h4>Pseudocod</h4>
+                <p style="font-size: 0.9em;">Conceptul pur</p>
+            </div>
+            <div class="feature-box" style="min-width: 150px;">
+                <div class="icon">⚙️</div>
+                <h4>C</h4>
+                <p style="font-size: 0.9em;">Control & performanță</p>
+            </div>
+            <div class="feature-box" style="min-width: 150px;">
+                <div class="icon">🐍</div>
+                <h4>Python</h4>
+                <p style="font-size: 0.9em;">Simplitate & expresivitate</p>
+            </div>
+        </div>
+        <p style="margin-top: 40px; color: var(--text-secondary);">
+            Înapoi la prezentarea principală pentru exerciții practice în C!
+        </p>
+    </div>
+    
+    <!-- Controale Navigare -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="slidAnterior()">← Anterior</button>
+        <button class="nav-btn" onclick="slidUrmator()">Următor →</button>
+    </div>
+    
+    <div class="slide-counter">
+        Slide <span id="currentSlide">1</span> / <span id="totalSlides">11</span>
+    </div>
+    
+    <script>
+        hljs.highlightAll();
+        
+        let slidCurent = 1;
+        const totalSliduri = document.querySelectorAll('.slide').length;
+        
+        document.getElementById('totalSlides').textContent = totalSliduri;
+        
+        function arataSlid(n) {
+            const sliduri = document.querySelectorAll('.slide');
+            
+            if (n > totalSliduri) slidCurent = 1;
+            if (n < 1) slidCurent = totalSliduri;
+            
+            sliduri.forEach(slid => slid.classList.remove('active'));
+            sliduri[slidCurent - 1].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = slidCurent;
+            document.getElementById('progressFill').style.width = 
+                ((slidCurent / totalSliduri) * 100) + '%';
+        }
+        
+        function slidUrmator() { slidCurent++; arataSlid(slidCurent); }
+        function slidAnterior() { slidCurent--; arataSlid(slidCurent); }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') slidUrmator();
+            else if (e.key === 'ArrowLeft') slidAnterior();
+            else if (e.key === 'Home') { slidCurent = 1; arataSlid(slidCurent); }
+            else if (e.key === 'End') { slidCurent = totalSliduri; arataSlid(slidCurent); }
+        });
+        
+        arataSlid(1);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+data/test_image.bmp
+output_gray.bmp

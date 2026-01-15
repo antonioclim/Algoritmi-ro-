@@ -1,0 +1,7 @@
+Student adăugat cu succes!
+Student adăugat cu succes!
+ID: 1001       Nume: Popescu Ion
+ID: 1002       Nume: Ionescu Maria
+Total studenți activi: 2
+Student găsit:
+ID: 1001       Nume: Popescu Ion

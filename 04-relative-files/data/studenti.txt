@@ -1,0 +1,10 @@
+101 Popescu_Ion 8.75
+102 Ionescu_Maria 9.50
+103 Georgescu_Ana 7.25
+104 Constantinescu_Andrei 8.00
+105 Dumitrescu_Elena 9.25
+106 Stanescu_Mihai 6.50
+107 Marinescu_Cristina 8.50
+108 Vasilescu_Alexandru 7.75
+109 Popa_Diana 9.00
+110 Radu_Stefan 8.25

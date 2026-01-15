@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Săptămâna 04: Liste Înlănțuite | ATP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+    <style>
+        /* =================================================================
+           TEMA PRINCIPALĂ - GitHub Dark Style
+           ================================================================= */
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        /* =================================================================
+           PROGRESS BAR
+           ================================================================= */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s ease;
+        }
+
+        /* =================================================================
+           SLIDE CONTAINER
+           ================================================================= */
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px 80px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        /* =================================================================
+           TITLURI
+           ================================================================= */
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.8rem;
+        }
+
+        /* =================================================================
+           TEXT ȘI LISTE
+           ================================================================= */
+        p {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            font-size: 1.15rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-primary);
+        }
+
+        li::marker {
+            color: var(--accent-blue);
+        }
+
+        /* =================================================================
+           BLOCURI DE COD
+           ================================================================= */
+        .code-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .lang-badge {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* =================================================================
+           DIAGRAME ASCII
+           ================================================================= */
+        .ascii-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--accent-green);
+        }
+
+        /* =================================================================
+           CASETE SPECIALE
+           ================================================================= */
+        .info-box {
+            background: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background: rgba(210, 153, 34, 0.1);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .danger-box {
+            background: rgba(248, 81, 73, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .success-box {
+            background: rgba(63, 185, 80, 0.1);
+            border-left: 4px solid var(--accent-green);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        /* =================================================================
+           TABELE
+           ================================================================= */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg-secondary);
+        }
+
+        /* =================================================================
+           GRID LAYOUT
+           ================================================================= */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .column {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* =================================================================
+           CARD BOXES
+           ================================================================= */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .card-title {
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* =================================================================
+           QUOTE BOX
+           ================================================================= */
+        .quote-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote-author {
+            text-align: right;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-style: normal;
+        }
+
+        /* =================================================================
+           HIGHLIGHT TEXT
+           ================================================================= */
+        .highlight {
+            color: var(--accent-yellow);
+            font-weight: 600;
+        }
+
+        .keyword {
+            color: var(--accent-purple);
+            font-family: 'Fira Code', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* =================================================================
+           TITLE SLIDE
+           ================================================================= */
+        .title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: 3.5rem;
+            border: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 2rem;
+        }
+
+        .title-slide .meta {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* =================================================================
+           NAVIGATION
+           ================================================================= */
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        /* =================================================================
+           SLIDE COUNTER
+           ================================================================= */
+        .slide-counter {
+            position: fixed;
+            bottom: 25px;
+            left: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+
+        /* =================================================================
+           EMOJI ICONS
+           ================================================================= */
+        .emoji-large {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* =================================================================
+           SUMMARY BOXES
+           ================================================================= */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .summary-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .summary-box .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-box .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* =================================================================
+           RESPONSIVE
+           ================================================================= */
+        @media (max-width: 1200px) {
+            .slide {
+                padding: 40px 50px;
+            }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.6rem; }
+        }
+
+        @media (max-width: 768px) {
+            .two-columns, .three-columns {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- ============================================================
+             SLIDE 1: TITLU
+             ============================================================ -->
+        <div class="slide title-slide active">
+            <div class="emoji-large">🔗</div>
+            <h1>Liste Înlănțuite</h1>
+            <p class="subtitle">Linked Lists în C</p>
+            <p class="meta">
+                <strong>Săptămâna 04</strong> | Algoritmi și Tehnici de Programare<br>
+                Academia de Studii Economice, București
+            </p>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 2: OBIECTIVE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🎯 Obiective de Învățare</h1>
+            <p>La finalul acestei prezentări, veți fi capabili să:</p>
+            <ol>
+                <li><strong>Recunoașteți</strong> și descrieți structura unui nod și a unei liste înlănțuite</li>
+                <li><strong>Înțelegeți</strong> diferențele dintre alocarea statică și dinamică a memoriei</li>
+                <li><strong>Aplicați</strong> operațiile fundamentale: inserare, ștergere, căutare</li>
+                <li><strong>Analizați</strong> complexitatea temporală și spațială a operațiilor</li>
+                <li><strong>Evaluați</strong> când să folosiți linked list vs. array</li>
+                <li><strong>Creați</strong> implementări complete cu gestiune corectă a memoriei</li>
+            </ol>
+            <div class="info-box">
+                <strong>📌 Notă:</strong> Listele înlănțuite sunt fundamentul pentru stive, cozi, arbori și grafuri!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 3: CONTEXT ISTORIC
+             ============================================================ -->
+        <div class="slide">
+            <h1>📜 Context Istoric</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Timeline</h3>
+                    <ul>
+                        <li><strong>1955-1956:</strong> IPL (Information Processing Language) - prima implementare</li>
+                        <li><strong>1958:</strong> LISP (List Processing) - John McCarthy</li>
+                        <li><strong>1960s:</strong> Adoptare în sisteme de operare</li>
+                        <li><strong>Prezent:</strong> Fundament al structurilor de date moderne</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Aplicații Istorice</h3>
+                    <ul>
+                        <li>Logic Theorist - primul program AI</li>
+                        <li>Compilatoare și interpretoare</li>
+                        <li>Gestiunea memoriei în SO</li>
+                        <li>Baze de date timpurii</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="info-box">
+                IPL a fost dezvoltat pentru a crea inteligență artificială - linked lists au fost inventate pentru a reprezenta cunoașterea!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 4: FIGURĂ CHEIE
+             ============================================================ -->
+        <div class="slide">
+            <h1>👨‍🔬 Figură Cheie: Allen Newell</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Biografie (1927-1992)</h3>
+                    <ul>
+                        <li>Pionier al inteligenței artificiale</li>
+                        <li>Co-creator al IPL și linked lists</li>
+                        <li>Premiul Turing 1975</li>
+                        <li>Profesor la Carnegie Mellon</li>
+                    </ul>
+                    <h3>Contribuții</h3>
+                    <ul>
+                        <li>Logic Theorist (1956)</li>
+                        <li>General Problem Solver</li>
+                        <li>Teoria unitară a cogniției</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="quote-box">
+                        „Computerul este remarcabil nu pentru ceea ce poate face, ci pentru ceea ce ne permite să gândim."
+                        <p class="quote-author">— Allen Newell</p>
+                    </div>
+                    <div class="success-box">
+                        <strong>Impact:</strong> Conceptele dezvoltate de Newell stau la baza programării moderne și a inteligenței artificiale.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 5: DE CE LINKED LISTS?
+             ============================================================ -->
+        <div class="slide">
+            <h1>❓ De Ce Avem Nevoie de Linked Lists?</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Limitările Array-urilor</h3>
+                    <ul>
+                        <li>Dimensiune fixă la declarare</li>
+                        <li>Inserarea/ștergerea necesită mutarea elementelor</li>
+                        <li>Redimensionarea este costisitoare</li>
+                        <li>Memoria trebuie să fie contiguă</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Avantajele Linked Lists</h3>
+                    <ul>
+                        <li>Dimensiune dinamică</li>
+                        <li>Inserare/ștergere în O(1)*</li>
+                        <li>Nu necesită memorie contiguă</li>
+                        <li>Utilizare eficientă a memoriei</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ascii-diagram">
+ARRAY (inserare la poziția 2):         LINKED LIST (inserare):
+┌───┬───┬───┬───┬───┐                  ┌───┐   ┌───┐   ┌───┐
+│ A │ B │ C │ D │ E │ → mută C,D,E     │ A ├──►│ X ├──►│ B │ → doar schimbă pointeri
+└───┴───┴───┴───┴───┘                  └───┘   └───┘   └───┘
+    O(n) operații                          O(1) operații*
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 6: STRUCTURA UNUI NODE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🧱 Structura Fundamentală: Node</h1>
+            <p>Un <span class="keyword">node</span> conține două componente esențiale:</p>
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────┐
+│              NODE (Nod)                 │
+├───────────────────┬─────────────────────┤
+│       DATA        │        NEXT         │
+│    (date utile)   │   (pointer către    │
+│                   │    nodul următor)   │
+├───────────────────┼─────────────────────┤
+│   int, float,     │   struct Node*      │
+│   char[], struct  │   sau NULL          │
+└───────────────────┴─────────────────────┘
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Definiția structurii Node în C</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">typedef struct Node {
+    int data;           /* Datele stocate - poate fi orice tip */
+    struct Node *next;  /* Pointer către următorul nod */
+} Node;</code></pre>
+            </div>
+            <div class="warning-box">
+                <strong>⚠️ Atenție:</strong> Folosim <code>struct Node *next</code> în interior deoarece <code>typedef</code> nu este încă complet definit!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 7: VIZUALIZAREA LISTEI
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔗 Vizualizarea unei Liste Simplu Înlănțuite</h1>
+            <div class="ascii-diagram">
+                HEAD (capul listei)
+                  │
+                  ▼
+             ┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐
+             │ data: 10│      │ data: 20│      │ data: 30│      │ data: 40│
+             │─────────│      │─────────│      │─────────│      │─────────│
+             │ next: ●─┼─────►│ next: ●─┼─────►│ next: ●─┼─────►│next:NULL│
+             └─────────┘      └─────────┘      └─────────┘      └─────────┘
+                Node 1           Node 2           Node 3           Node 4
+                                                                  (ultimul)
+            </div>
+            <div class="info-box">
+                <strong>🔑 Concepte cheie:</strong>
+                <ul>
+                    <li><strong>HEAD</strong> - pointer către primul nod (punct de intrare în listă)</li>
+                    <li><strong>TAIL</strong> - ultimul nod (next = NULL)</li>
+                    <li><strong>NULL</strong> - marchează sfârșitul listei</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 8: MALLOC ȘI FREE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🧠 Gestiunea Memoriei: malloc() și free()</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>malloc() - Memory Allocation</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Alocarea dinamică</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Alocă memorie pentru un nod */
+Node *new_node = (Node *)malloc(sizeof(Node));
+
+/* Verifică dacă alocarea a reușit */
+if (new_node == NULL) {
+    fprintf(stderr, "Eroare: memorie insuficientă!\n");
+    exit(EXIT_FAILURE);
+}
+
+/* Inițializează nodul */
+new_node->data = 42;
+new_node->next = NULL;</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3>free() - Eliberarea memoriei</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Eliberarea memoriei</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Eliberează memoria unui nod */
+free(node_ptr);
+
+/* Bună practică: setează pointerul la NULL */
+node_ptr = NULL;
+
+/* Eliberarea întregii liste */
+while (head != NULL) {
+    Node *temp = head;
+    head = head->next;
+    free(temp);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="danger-box">
+                <strong>🚨 CRITIC:</strong> Fiecare <code>malloc()</code> trebuie să aibă un <code>free()</code> corespondent! Altfel → memory leak!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 9: CREAREA UNUI NODE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔨 Funcție: Crearea unui Node Nou</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Funcție completă pentru crearea unui nod</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Creează un nod nou cu valoarea specificată.
+ * 
+ * @param value Valoarea de stocat în nod
+ * @return Pointer către noul nod sau NULL dacă alocarea eșuează
+ */
+Node *create_node(int value) {
+    /* Pasul 1: Alocă memorie */
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    
+    /* Pasul 2: Verifică alocarea */
+    if (new_node == NULL) {
+        fprintf(stderr, "Eroare: malloc() a eșuat!\n");
+        return NULL;
+    }
+    
+    /* Pasul 3: Inițializează câmpurile */
+    new_node->data = value;
+    new_node->next = NULL;
+    
+    /* Pasul 4: Returnează noul nod */
+    return new_node;
+}</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>✅ Bune practici:</strong> Verifică întotdeauna valoarea returnată de malloc(), inițializează toate câmpurile și returnează NULL în caz de eroare.
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 10: INSERARE LA ÎNCEPUT
+             ============================================================ -->
+        <div class="slide">
+            <h1>➡️ Inserarea la Început (Prepend)</h1>
+            <div class="ascii-diagram">
+ÎNAINTE:                              DUPĂ:
+HEAD                                  HEAD
+  │                                     │
+  ▼                                     ▼
+┌─────┐   ┌─────┐   ┌─────┐          ┌─────┐   ┌─────┐   ┌─────┐   ┌─────┐
+│  B  │──►│  C  │──►│  D  │   ───►   │  A  │──►│  B  │──►│  C  │──►│  D  │
+└─────┘   └─────┘   └─────┘          └─────┘   └─────┘   └─────┘   └─────┘
+                                       NEW
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Inserare la început - O(1)</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Inserează un nod nou la începutul listei.
+ * Complexitate: O(1)
+ */
+void prepend(Node **head, int value) {
+    /* Creează noul nod */
+    Node *new_node = create_node(value);
+    if (new_node == NULL) return;
+    
+    /* Noul nod pointează către fostul cap */
+    new_node->next = *head;
+    
+    /* Actualizează head-ul */
+    *head = new_node;
+}</code></pre>
+            </div>
+            <div class="info-box">
+                <strong>💡 De ce Node **head?</strong> Avem nevoie de pointer la pointer pentru a modifica valoarea lui head din funcția apelantă!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 11: INSERARE LA SFÂRȘIT
+             ============================================================ -->
+        <div class="slide">
+            <h1>⬅️ Inserarea la Sfârșit (Append)</h1>
+            <div class="ascii-diagram">
+ÎNAINTE:                              DUPĂ:
+HEAD                    TAIL          HEAD                              TAIL
+  │                       │             │                                 │
+  ▼                       ▼             ▼                                 ▼
+┌─────┐   ┌─────┐   ┌─────┐          ┌─────┐   ┌─────┐   ┌─────┐   ┌─────┐
+│  A  │──►│  B  │──►│NULL │   ───►   │  A  │──►│  B  │──►│  C  │──►│NULL │
+└─────┘   └─────┘   └─────┘          └─────┘   └─────┘   └─────┘   └─────┘
+                                                           NEW
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Inserare la sfârșit - O(n)</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Inserează un nod nou la sfârșitul listei.
+ * Complexitate: O(n) - trebuie să parcurgem toată lista
+ */
+void append(Node **head, int value) {
+    Node *new_node = create_node(value);
+    if (new_node == NULL) return;
+    
+    /* Caz special: lista este goală */
+    if (*head == NULL) {
+        *head = new_node;
+        return;
+    }
+    
+    /* Parcurge lista până la ultimul nod */
+    Node *current = *head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    
+    /* Atașează noul nod */
+    current->next = new_node;
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 12: INSERARE LA POZIȚIE
+             ============================================================ -->
+        <div class="slide">
+            <h1>📍 Inserarea la o Poziție Specificată</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Inserare la poziția k - O(n)</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Inserează un nod nou la poziția specificată (0-indexed).
+ */
+void insert_at(Node **head, int value, int position) {
+    /* Caz special: inserare la început */
+    if (position == 0) {
+        prepend(head, value);
+        return;
+    }
+    
+    Node *new_node = create_node(value);
+    if (new_node == NULL) return;
+    
+    /* Parcurge lista până la poziția (position - 1) */
+    Node *current = *head;
+    for (int i = 0; i < position - 1 && current != NULL; i++) {
+        current = current->next;
+    }
+    
+    /* Verifică dacă poziția este validă */
+    if (current == NULL) {
+        fprintf(stderr, "Eroare: poziție invalidă!\n");
+        free(new_node);
+        return;
+    }
+    
+    /* Inserează noul nod */
+    new_node->next = current->next;
+    current->next = new_node;
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 13: TRAVERSARE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🚶 Traversarea Listei</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Afișare simplă</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Print list</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">void print_list(Node *head) {
+    printf("Lista: ");
+    Node *current = head;
+    
+    while (current != NULL) {
+        printf("%d", current->data);
+        if (current->next != NULL) {
+            printf(" -> ");
+        }
+        current = current->next;
+    }
+    
+    printf(" -> NULL\n");
+}</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3>Numărare elemente</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Count nodes</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">int count_nodes(Node *head) {
+    int count = 0;
+    Node *current = head;
+    
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    
+    return count;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="info-box">
+                <strong>📌 Pattern de traversare:</strong> <code>Node *current = head; while (current != NULL) { /* proces */ current = current->next; }</code>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 14: CĂUTARE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔍 Căutarea în Listă</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Căutare după valoare</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Find by value</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/**
+ * Caută un nod după valoare.
+ * @return Pointer către nod sau NULL
+ */
+Node *find_node(Node *head, int value) {
+    Node *current = head;
+    
+    while (current != NULL) {
+        if (current->data == value) {
+            return current;
+        }
+        current = current->next;
+    }
+    
+    return NULL;  /* Nu a fost găsit */
+}</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3>Căutare după index</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Get at index</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/**
+ * Returnează nodul de la indexul dat.
+ */
+Node *get_at(Node *head, int index) {
+    if (index < 0) return NULL;
+    
+    Node *current = head;
+    int i = 0;
+    
+    while (current != NULL && i < index) {
+        current = current->next;
+        i++;
+    }
+    
+    return current;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="warning-box">
+                <strong>⚠️ Complexitate:</strong> Căutarea în linked list este O(n) - nu putem face căutare binară!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 15: ȘTERGERE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🗑️ Ștergerea unui Node</h1>
+            <div class="ascii-diagram">
+Ștergere nod cu valoarea 20:
+                    
+ÎNAINTE:  HEAD→[10]→[20]→[30]→NULL
+                      ↓
+                   DELETE
+                      ↓
+DUPĂ:     HEAD→[10]────→[30]→NULL
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Ștergere nod după valoare</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">void delete_node(Node **head, int value) {
+    if (*head == NULL) return;
+    
+    /* Caz special: ștergem head-ul */
+    if ((*head)->data == value) {
+        Node *temp = *head;
+        *head = (*head)->next;
+        free(temp);
+        return;
+    }
+    
+    /* Căutăm nodul anterior celui de șters */
+    Node *current = *head;
+    while (current->next != NULL && current->next->data != value) {
+        current = current->next;
+    }
+    
+    /* Dacă am găsit nodul */
+    if (current->next != NULL) {
+        Node *temp = current->next;
+        current->next = temp->next;
+        free(temp);
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 16: ELIBERAREA LISTEI
+             ============================================================ -->
+        <div class="slide">
+            <h1>🧹 Eliberarea Întregii Liste</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Free entire list - OBLIGATORIU pentru a evita memory leaks!</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Eliberează toată memoria alocată pentru listă.
+ * TREBUIE apelată înainte de terminarea programului!
+ */
+void free_list(Node **head) {
+    Node *current = *head;
+    Node *next_node;
+    
+    while (current != NULL) {
+        /* Salvăm pointer-ul către următorul nod */
+        next_node = current->next;
+        
+        /* Eliberăm nodul curent */
+        free(current);
+        
+        /* Avansăm la următorul nod */
+        current = next_node;
+    }
+    
+    /* Setăm head la NULL pentru siguranță */
+    *head = NULL;
+}
+
+/* Utilizare în main() */
+int main(void) {
+    Node *head = NULL;
+    /* ... operații pe listă ... */
+    
+    free_list(&head);  /* OBLIGATORIU! */
+    return 0;
+}</code></pre>
+            </div>
+            <div class="danger-box">
+                <strong>🚨 CRITIC:</strong> Fără <code>free_list()</code>, programul va avea memory leaks. Valgrind va detecta și raporta aceste probleme!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 17: LISTA DUBLU ÎNLĂNȚUITĂ
+             ============================================================ -->
+        <div class="slide">
+            <h1>↔️ Lista Dublu Înlănțuită (Doubly Linked List)</h1>
+            <div class="ascii-diagram">
+        HEAD                                                          TAIL
+          │                                                             │
+          ▼                                                             ▼
+     ┌─────────┐        ┌─────────┐        ┌─────────┐        ┌─────────┐
+     │prev:NULL│◄──────►│  prev   │◄──────►│  prev   │◄──────►│  prev   │
+     │ data: A │        │ data: B │        │ data: C │        │ data: D │
+     │  next   │◄──────►│  next   │◄──────►│  next   │◄──────►│next:NULL│
+     └─────────┘        └─────────┘        └─────────┘        └─────────┘
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Structura unui nod dublu înlănțuit</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">typedef struct DNode {
+    int data;
+    struct DNode *prev;  /* Pointer către nodul anterior */
+    struct DNode *next;  /* Pointer către nodul următor */
+} DNode;
+
+/* Structura listei cu head și tail */
+typedef struct {
+    DNode *head;
+    DNode *tail;
+    int size;
+} DoublyLinkedList;</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>✅ Avantaje:</strong> Navigare în ambele direcții, ștergere în O(1) dacă ai pointer-ul la nod, implementare undo/redo.
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 18: OPERAȚII PE LISTĂ DUBLĂ
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔄 Operații pe Lista Dublu Înlănțuită</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Inserare și ștergere în listă dublă</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/* Inserare la sfârșit */
+void dll_append(DoublyLinkedList *list, int value) {
+    DNode *new_node = (DNode *)malloc(sizeof(DNode));
+    new_node->data = value;
+    new_node->next = NULL;
+    new_node->prev = list->tail;
+    
+    if (list->tail != NULL) {
+        list->tail->next = new_node;
+    } else {
+        list->head = new_node;  /* Prima inserare */
+    }
+    list->tail = new_node;
+    list->size++;
+}
+
+/* Ștergere nod specific (când ai pointer-ul) - O(1)! */
+void dll_remove_node(DoublyLinkedList *list, DNode *node) {
+    if (node->prev != NULL) node->prev->next = node->next;
+    else list->head = node->next;
+    
+    if (node->next != NULL) node->next->prev = node->prev;
+    else list->tail = node->prev;
+    
+    free(node);
+    list->size--;
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 19: LISTA CIRCULARĂ
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔄 Lista Circulară</h1>
+            <div class="ascii-diagram">
+                                     HEAD
+                                       │
+                                       ▼
+                  ┌────────────────►┌─────┐
+                  │                 │  A  │
+                  │                 └──┬──┘
+                  │                    │
+                  │                    ▼
+               ┌──┴──┐              ┌─────┐
+               │  D  │◄─────────────│  B  │
+               └─────┘              └──┬──┘
+                  ▲                    │
+                  │                    ▼
+                  │                 ┌─────┐
+                  └─────────────────│  C  │
+                                   └─────┘
+            </div>
+            <div class="two-columns">
+                <div>
+                    <h3>Aplicații</h3>
+                    <ul>
+                        <li>Round-robin scheduling în SO</li>
+                        <li>Playlist-uri în mod repeat</li>
+                        <li>Buffer circular</li>
+                        <li>Jocuri (tura jucătorilor)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Detectarea sfârșitului</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Traversare listă circulară</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Nu verificăm NULL! */
+Node *current = head;
+do {
+    /* procesează current */
+    current = current->next;
+} while (current != head);</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 20: COMPARAȚIE TIPURI DE LISTE
+             ============================================================ -->
+        <div class="slide">
+            <h1>📊 Comparație: Tipuri de Liste</h1>
+            <table>
+                <tr>
+                    <th>Caracteristică</th>
+                    <th>Simplu Înlănțuită</th>
+                    <th>Dublu Înlănțuită</th>
+                    <th>Circulară</th>
+                </tr>
+                <tr>
+                    <td>Memorie/nod</td>
+                    <td>data + 1 pointer</td>
+                    <td>data + 2 pointeri</td>
+                    <td>data + 1-2 pointeri</td>
+                </tr>
+                <tr>
+                    <td>Traversare</td>
+                    <td>Doar înainte</td>
+                    <td>Ambele direcții</td>
+                    <td>Ciclic</td>
+                </tr>
+                <tr>
+                    <td>Inserare la început</td>
+                    <td>O(1)</td>
+                    <td>O(1)</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>Inserare la sfârșit</td>
+                    <td>O(n)*</td>
+                    <td>O(1) cu tail</td>
+                    <td>O(1) cu tail</td>
+                </tr>
+                <tr>
+                    <td>Ștergere nod dat</td>
+                    <td>O(n)</td>
+                    <td>O(1)</td>
+                    <td>O(1) sau O(n)</td>
+                </tr>
+                <tr>
+                    <td>Complexitate cod</td>
+                    <td>Simplă</td>
+                    <td>Medie</td>
+                    <td>Mai complexă</td>
+                </tr>
+            </table>
+            <p style="margin-top: 1rem; color: var(--text-secondary);">* O(1) dacă menținem un pointer tail</p>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 21: COMPLEXITATE - GRAFIC
+             ============================================================ -->
+        <div class="slide">
+            <h1>📈 Complexitate: Array vs. Linked List</h1>
+            <table>
+                <tr>
+                    <th>Operație</th>
+                    <th>Array</th>
+                    <th>Linked List</th>
+                    <th>Câștigător</th>
+                </tr>
+                <tr>
+                    <td>Acces la index[i]</td>
+                    <td style="color: var(--accent-green);">O(1)</td>
+                    <td style="color: var(--accent-red);">O(n)</td>
+                    <td>Array</td>
+                </tr>
+                <tr>
+                    <td>Inserare la început</td>
+                    <td style="color: var(--accent-red);">O(n)</td>
+                    <td style="color: var(--accent-green);">O(1)</td>
+                    <td>Linked List</td>
+                </tr>
+                <tr>
+                    <td>Inserare la sfârșit</td>
+                    <td style="color: var(--accent-yellow);">O(1)*</td>
+                    <td style="color: var(--accent-yellow);">O(1)**</td>
+                    <td>Egalitate</td>
+                </tr>
+                <tr>
+                    <td>Ștergere la început</td>
+                    <td style="color: var(--accent-red);">O(n)</td>
+                    <td style="color: var(--accent-green);">O(1)</td>
+                    <td>Linked List</td>
+                </tr>
+                <tr>
+                    <td>Căutare</td>
+                    <td style="color: var(--accent-yellow);">O(n)</td>
+                    <td style="color: var(--accent-yellow);">O(n)</td>
+                    <td>Egalitate</td>
+                </tr>
+                <tr>
+                    <td>Cache locality</td>
+                    <td style="color: var(--accent-green);">Excelent</td>
+                    <td style="color: var(--accent-red);">Slab</td>
+                    <td>Array</td>
+                </tr>
+            </table>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                * Array amortizat (cu redimensionare)<br>
+                ** Linked list cu pointer tail
+            </p>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 22: MODELUL DE MEMORIE
+             ============================================================ -->
+        <div class="slide">
+            <h1>🧠 Modelul de Memorie</h1>
+            <div class="ascii-diagram">
+MEMORIA PROGRAMULUI:
+
+┌──────────────────────────────────────────────────────────┐
+│                         STACK                            │  ← Variabile locale
+│  ┌─────────────────────────────────────────────────────┐ │     (head pointer)
+│  │ Node *head = 0x1000                                 │ │
+│  └─────────────────────────────────────────────────────┘ │
+├──────────────────────────────────────────────────────────┤
+│                          HEAP                            │  ← Memorie dinamică
+│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────┐ │     (nodurile listei)
+│  │ Addr: 0x1000    │  │ Addr: 0x2000    │  │ 0x3000   │ │
+│  │ data: 10        │  │ data: 20        │  │ data: 30 │ │
+│  │ next: 0x2000 ───┼──┼►next: 0x3000 ───┼──┼►next:NULL│ │
+│  └─────────────────┘  └─────────────────┘  └──────────┘ │
+│                                                          │
+│  [Memoria poate fi non-contiguă!]                        │
+├──────────────────────────────────────────────────────────┤
+│                       DATA/BSS                           │  ← Variabile globale
+├──────────────────────────────────────────────────────────┤
+│                         CODE                             │  ← Codul programului
+└──────────────────────────────────────────────────────────┘
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 23: ERORI COMUNE - PARTEA 1
+             ============================================================ -->
+        <div class="slide">
+            <h1>⚠️ Erori Comune (1/2)</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>❌ NULL Pointer Dereference</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>GREȘIT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Crash dacă head este NULL! */
+printf("%d", head->data);</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>CORECT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Verifică întotdeauna! */
+if (head != NULL) {
+    printf("%d", head->data);
+}</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3>❌ Memory Leak</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>GREȘIT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Memoria se pierde! */
+head = new_node;  // fără free</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>CORECT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Eliberează mai întâi! */
+free_list(&head);
+head = new_node;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 24: ERORI COMUNE - PARTEA 2
+             ============================================================ -->
+        <div class="slide">
+            <h1>⚠️ Erori Comune (2/2)</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>❌ Dangling Pointer</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>GREȘIT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">free(node);
+/* node încă pointează la 
+   memorie eliberată! */
+node->data = 5;  /* CRASH! */</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>CORECT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">free(node);
+node = NULL;  /* Siguranță */</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3>❌ Pierderea Legăturii</h3>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>GREȘIT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Inserare: pierdem restul listei! */
+current->next = new_node;
+/* Ce se întâmplă cu fostul 
+   current->next? PIERDUT! */</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>CORECT</span>
+                            <span class="lang-badge">C</span>
+                        </div>
+                        <pre><code class="language-c">/* Ordinea contează! */
+new_node->next = current->next;
+current->next = new_node;</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="danger-box">
+                <strong>🎯 Regulă de aur:</strong> La inserare, conectează mai întâi noul nod la lista existentă, apoi modifică pointer-ul anterior!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 25: DEBUGGING CU GDB
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔧 Debugging: GDB pentru Liste</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Comenzi GDB utile pentru linked lists</span>
+                    <span class="lang-badge">GDB</span>
+                </div>
+                <pre><code class="language-bash"># Compilare cu simboluri de debug
+$ gcc -g -o program program.c
+
+# Pornire GDB
+$ gdb ./program
+
+# Comenzi GDB:
+(gdb) break main              # Breakpoint la main
+(gdb) run                     # Rulează programul
+(gdb) print head              # Afișează valoarea lui head
+(gdb) print *head             # Dereferențiază: afișează conținutul nodului
+(gdb) print head->data        # Afișează data din head
+(gdb) print head->next        # Afișează pointer-ul next
+(gdb) print *head->next       # Afișează al doilea nod
+
+# Parcurgere pas cu pas
+(gdb) next                    # Următoarea linie
+(gdb) step                    # Intră în funcție
+(gdb) continue                # Continuă până la următorul breakpoint
+
+# Afișare listă (manual)
+(gdb) set $node = head
+(gdb) while $node != 0
+> print $node->data
+> set $node = $node->next
+> end</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 26: DEBUGGING CU VALGRIND
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔍 Debugging: Valgrind pentru Memory Leaks</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Utilizare Valgrind</span>
+                    <span class="lang-badge">Bash</span>
+                </div>
+                <pre><code class="language-bash"># Verificare completă a memoriei
+$ valgrind --leak-check=full --show-leak-kinds=all ./program
+
+# Output pentru program CORECT:
+==12345== HEAP SUMMARY:
+==12345==   in use at exit: 0 bytes in 0 blocks
+==12345==   total heap usage: 5 allocs, 5 frees, 80 bytes allocated
+==12345== All heap blocks were freed -- no leaks are possible
+
+# Output pentru program CU MEMORY LEAK:
+==12345== LEAK SUMMARY:
+==12345==    definitely lost: 48 bytes in 3 blocks
+==12345==    indirectly lost: 0 bytes in 0 blocks
+==12345==    possibly lost: 0 bytes in 0 blocks
+==12345== ERROR SUMMARY: 1 errors from 1 contexts</code></pre>
+            </div>
+            <div class="warning-box">
+                <strong>📌 Interpretare:</strong>
+                <ul>
+                    <li><strong>definitely lost</strong> = memory leak sigur (trebuie reparat!)</li>
+                    <li><strong>indirectly lost</strong> = memorie pierdută prin alte leaks</li>
+                    <li><strong>possibly lost</strong> = pointer-i modificați (de investigat)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 27: BUNE PRACTICI
+             ============================================================ -->
+        <div class="slide">
+            <h1>✅ Bune Practici</h1>
+            <div class="two-columns">
+                <div class="card">
+                    <h3 style="color: var(--accent-green);">✓ DO (Fă)</h3>
+                    <ul>
+                        <li>Verifică întotdeauna returnul lui <code>malloc()</code></li>
+                        <li>Setează pointerii la <code>NULL</code> după <code>free()</code></li>
+                        <li>Eliberează toată memoria înainte de exit</li>
+                        <li>Folosește funcții separate pentru fiecare operație</li>
+                        <li>Documentează cine este responsabil pentru eliberarea memoriei</li>
+                        <li>Testează cu Valgrind regulat</li>
+                        <li>Tratează toate cazurile limită (NULL, un element, etc.)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-red);">✗ DON'T (Nu Fă)</h3>
+                    <ul>
+                        <li>Nu dereferenția un pointer fără verificare</li>
+                        <li>Nu uita să eliberezi memoria</li>
+                        <li>Nu folosi un pointer după <code>free()</code></li>
+                        <li>Nu pierde legătura la restul listei la inserare</li>
+                        <li>Nu presupune că lista are elemente</li>
+                        <li>Nu ignora warning-urile compilatorului</li>
+                        <li>Nu copia cod fără să înțelegi ce face</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 28: PATTERN - SENTINEL NODE
+             ============================================================ -->
+        <div class="slide">
+            <h1>💡 Pattern Avansat: Sentinel Node</h1>
+            <p>Un <span class="highlight">sentinel node</span> (nod santinelă) este un nod "fals" care simplifică codul eliminând cazurile speciale.</p>
+            <div class="ascii-diagram">
+Fără sentinel:              Cu sentinel:
+HEAD → poate fi NULL        HEAD → SENTINEL → Date reale...
+(multe verificări)          (întotdeauna există un nod)
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Implementare cu sentinel node</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/* Inițializare cu sentinel */
+Node *create_list_with_sentinel(void) {
+    Node *sentinel = create_node(0);  /* Valoare dummy */
+    return sentinel;  /* Returnăm sentinel-ul ca head */
+}
+
+/* Inserare - nu mai verificăm dacă head e NULL! */
+void insert_after_sentinel(Node *sentinel, int value) {
+    Node *new_node = create_node(value);
+    new_node->next = sentinel->next;
+    sentinel->next = new_node;
+}
+
+/* Traversare - începem de la sentinel->next */
+void print_list_sentinel(Node *sentinel) {
+    Node *current = sentinel->next;  /* Sărim peste sentinel */
+    while (current != NULL) {
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 29: ALGORITM - INVERSARE LISTĂ
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔄 Algoritm Classic: Inversarea Listei</h1>
+            <div class="ascii-diagram">
+ÎNAINTE: HEAD → [A] → [B] → [C] → [D] → NULL
+DUPĂ:    HEAD → [D] → [C] → [B] → [A] → NULL
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Inversare in-place - O(n) timp, O(1) spațiu</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Inversează o listă simplu înlănțuită in-place.
+ * Folosește trei pointeri: prev, current, next
+ */
+void reverse_list(Node **head) {
+    Node *prev = NULL;
+    Node *current = *head;
+    Node *next_node = NULL;
+    
+    while (current != NULL) {
+        /* Salvează următorul nod */
+        next_node = current->next;
+        
+        /* Inversează legătura */
+        current->next = prev;
+        
+        /* Avansează pointerii */
+        prev = current;
+        current = next_node;
+    }
+    
+    /* prev este acum noul head */
+    *head = prev;
+}</code></pre>
+            </div>
+            <div class="info-box">
+                <strong>📝 Întrebare de interviu frecventă!</strong> Înțelegeți fiecare pas și puteți să îl desenați.
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 30: ALGORITM - DETECTARE CICLU
+             ============================================================ -->
+        <div class="slide">
+            <h1>🐢🐇 Algoritmul Floyd (Tortoise and Hare)</h1>
+            <p>Detectarea ciclurilor în liste înlănțuite folosind doi pointeri cu viteze diferite.</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Detectare ciclu - O(n) timp, O(1) spațiu</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Detectează dacă o listă are un ciclu.
+ * Slow pointer avansează cu 1, fast pointer cu 2.
+ * Dacă există ciclu, se vor întâlni.
+ */
+int has_cycle(Node *head) {
+    if (head == NULL) return 0;
+    
+    Node *slow = head;       /* Broasca țestoasă 🐢 */
+    Node *fast = head;       /* Iepurele 🐇 */
+    
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;           /* Avansează cu 1 */
+        fast = fast->next->next;     /* Avansează cu 2 */
+        
+        if (slow == fast) {
+            return 1;  /* Ciclu detectat! */
+        }
+    }
+    
+    return 0;  /* Nu există ciclu */
+}</code></pre>
+            </div>
+            <div class="success-box">
+                <strong>💡 De ce funcționează?</strong> Dacă există ciclu, fast-ul va "prinde din urmă" slow-ul în interiorul ciclului.
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 31: ALGORITM - GĂSIREA MIJLOCULUI
+             ============================================================ -->
+        <div class="slide">
+            <h1>📍 Găsirea Mijlocului într-o Singură Traversare</h1>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Tehnica slow/fast pointer</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/**
+ * Găsește nodul din mijlocul listei într-o singură traversare.
+ * Când fast ajunge la final, slow este la mijloc.
+ */
+Node *find_middle(Node *head) {
+    if (head == NULL) return NULL;
+    
+    Node *slow = head;
+    Node *fast = head;
+    
+    /* fast avansează de 2 ori mai repede */
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    
+    return slow;  /* slow este la mijloc */
+}
+
+/* Exemplu:
+ * Lista: 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+ * 
+ * Pas 1: slow=1, fast=1
+ * Pas 2: slow=2, fast=3
+ * Pas 3: slow=3, fast=5
+ * fast->next este NULL, STOP
+ * Rezultat: slow=3 (mijlocul)
+ */</code></pre>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 32: APLICAȚII REALE - LINUX KERNEL
+             ============================================================ -->
+        <div class="slide">
+            <h1>🐧 Aplicație Reală: Linux Kernel List</h1>
+            <p>Kernelul Linux folosește o implementare elegantă de liste dublu înlănțuite circulare.</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Simplificarea listei din Linux (include/linux/list.h)</span>
+                    <span class="lang-badge">C</span>
+                </div>
+                <pre><code class="language-c">/* Structura listei - doar pointerii! */
+struct list_head {
+    struct list_head *next, *prev;
+};
+
+/* Se include în orice structură */
+struct my_data {
+    int value;
+    char name[64];
+    struct list_head list;  /* Link către alte elemente */
+};
+
+/* Macro magic pentru a obține structura părinte */
+#define container_of(ptr, type, member) \
+    ((type *)((char *)(ptr) - offsetof(type, member)))
+
+#define list_entry(ptr, type, member) \
+    container_of(ptr, type, member)
+
+/* Utilizare */
+struct my_data *item = list_entry(ptr, struct my_data, list);</code></pre>
+            </div>
+            <div class="info-box">
+                <strong>💡 Avantaj:</strong> O singură implementare de listă pentru toate structurile de date din kernel!
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 33: PREVIZUALIZARE LABORATOR
+             ============================================================ -->
+        <div class="slide">
+            <h1>🔬 Previzualizare Laborator</h1>
+            <div class="two-columns">
+                <div class="card">
+                    <div class="card-title">📋 Exercițiul 1: Lista de Studenți</div>
+                    <p>Implementați o listă simplu înlănțuită pentru gestionarea datelor studenților:</p>
+                    <ul>
+                        <li>Structură Student: id, nume, medie</li>
+                        <li>Creare, inserare, căutare</li>
+                        <li>Ștergere după id</li>
+                        <li>Sortare după medie</li>
+                        <li>Salvare/încărcare din fișier</li>
+                    </ul>
+                    <p><strong>8 TODO-uri</strong></p>
+                </div>
+                <div class="card">
+                    <div class="card-title">🎵 Exercițiul 2: Playlist Muzical</div>
+                    <p>Implementați o listă dublu înlănțuită pentru un player muzical:</p>
+                    <ul>
+                        <li>Structură Melodie: titlu, artist, durată</li>
+                        <li>Navigare: next, prev, start, end</li>
+                        <li>Inserare sortată</li>
+                        <li>Mod shuffle</li>
+                        <li>Calculare durată totală</li>
+                    </ul>
+                    <p><strong>10 TODO-uri</strong></p>
+                </div>
+            </div>
+            <div class="success-box">
+                <strong>🎯 Obiectiv:</strong> Aplicarea practică a conceptelor teoretice în scenarii realiste.
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 34: REZUMAT
+             ============================================================ -->
+        <div class="slide">
+            <h1>📝 Rezumat</h1>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <div class="icon">🧱</div>
+                    <h3>Node</h3>
+                    <p>data + pointer next</p>
+                    <p class="label">Unitatea fundamentală</p>
+                </div>
+                <div class="summary-box">
+                    <div class="icon">📍</div>
+                    <h3>HEAD</h3>
+                    <p>Punctul de intrare</p>
+                    <p class="label">Pointer către primul nod</p>
+                </div>
+                <div class="summary-box">
+                    <div class="icon">➡️</div>
+                    <h3>Inserare O(1)</h3>
+                    <p>La început</p>
+                    <p class="label">Prepend</p>
+                </div>
+                <div class="summary-box">
+                    <div class="icon">🔍</div>
+                    <h3>Căutare O(n)</h3>
+                    <p>Traversare liniară</p>
+                    <p class="label">Nu suportă căutare binară</p>
+                </div>
+                <div class="summary-box">
+                    <div class="icon">🧠</div>
+                    <h3>malloc/free</h3>
+                    <p>Gestiunea memoriei</p>
+                    <p class="label">Evită memory leaks!</p>
+                </div>
+                <div class="summary-box">
+                    <div class="icon">↔️</div>
+                    <h3>Dublu Înlănțuită</h3>
+                    <p>prev + next</p>
+                    <p class="label">Navigare bidirecțională</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 35: RESURSE
+             ============================================================ -->
+        <div class="slide">
+            <h1>📚 Resurse Recomandate</h1>
+            <div class="two-columns">
+                <div>
+                    <h3>Cărți</h3>
+                    <ul>
+                        <li><strong>K&R</strong> - The C Programming Language (Cap. 6)</li>
+                        <li><strong>Sedgewick</strong> - Algorithms (Secț. 1.3)</li>
+                        <li><strong>CLRS</strong> - Introduction to Algorithms (Cap. 10)</li>
+                        <li><strong>Knuth</strong> - TAOCP Vol. 1</li>
+                    </ul>
+                    <h3>Online</h3>
+                    <ul>
+                        <li>Stanford CS Library - Linked List Basics</li>
+                        <li>GeeksforGeeks - Data Structures</li>
+                        <li>Visualgo.net - Vizualizări interactive</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Practică</h3>
+                    <ul>
+                        <li><strong>LeetCode</strong> - Linked List problems</li>
+                        <li><strong>HackerRank</strong> - Data Structures track</li>
+                        <li><strong>Exercism</strong> - C track</li>
+                    </ul>
+                    <h3>Tools</h3>
+                    <ul>
+                        <li><strong>Valgrind</strong> - Memory checking</li>
+                        <li><strong>GDB</strong> - Debugging</li>
+                        <li><strong>AddressSanitizer</strong> - Runtime checking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SLIDE 36: ÎNTREBĂRI
+             ============================================================ -->
+        <div class="slide title-slide">
+            <div class="emoji-large">❓</div>
+            <h1>Întrebări?</h1>
+            <p class="subtitle">Discuție și clarificări</p>
+            <div style="margin-top: 3rem;">
+                <p class="meta">
+                    <strong>Săptămâna următoare:</strong><br>
+                    📚 Stive (Stacks) - LIFO, push, pop, aplicații
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="goToSlide(0)" title="Prima">⏮</button>
+        <button class="nav-btn" onclick="previousSlide()" title="Anterior">◀</button>
+        <button class="nav-btn" onclick="nextSlide()" title="Următor">▶</button>
+        <button class="nav-btn" onclick="goToSlide(totalSlides - 1)" title="Ultima">⏭</button>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">36</span>
+    </div>
+
+    <script>
+        // Inițializare
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        // Highlight.js
+        hljs.highlightAll();
+        
+        // Funcții de navigare
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('currentSlide').textContent = index + 1;
+            updateProgressBar();
+        }
+        
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlideIndex = index;
+                showSlide(currentSlideIndex);
+            }
+        }
+        
+        function updateProgressBar() {
+            const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+            }
+        });
+        
+        // Inițializare progress bar
+        updateProgressBar();
+    </script>
+</body>
+</html>
