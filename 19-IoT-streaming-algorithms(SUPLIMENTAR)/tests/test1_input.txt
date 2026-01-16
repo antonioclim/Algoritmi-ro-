@@ -1,0 +1,2 @@
+# Test pentru Exercise 1 - Smart Building Monitor
+# Acest test verifică filtrarea și detecția temperaturilor anormale

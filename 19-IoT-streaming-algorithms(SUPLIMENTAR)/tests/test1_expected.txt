@@ -1,0 +1,3 @@
+# Output așteptat pentru Exercise 1
+# Alerte pentru camere cu temperatură în afara intervalului 18-26°C
+# Rapoarte periodice la fiecare 10 minute

@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Săptămâna 19: Algoritmi pentru IoT și Stream Processing</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --code-bg: #282c34;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow: hidden;
+        }
+        
+        /* Slide Container */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.5s ease;
+        }
+        
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(120deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent);
+            padding-left: 20px;
+        }
+        
+        h3 {
+            font-size: 1.8rem;
+            color: var(--warning);
+            margin: 20px 0 15px;
+        }
+        
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 30px;
+        }
+        
+        ul li::before {
+            content: "▸";
+            color: var(--accent);
+            margin-right: 15px;
+        }
+        
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            padding: 25px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-left: 4px solid var(--secondary);
+            margin: 15px 0;
+        }
+        
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            color: #abb2bf;
+        }
+        
+        .keyword { color: #c678dd; }
+        .type { color: #e5c07b; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+        .comment { color: #5c6370; font-style: italic; }
+        
+        /* Columns Layout */
+        .columns {
+            display: flex;
+            gap: 40px;
+            flex: 1;
+        }
+        
+        .column {
+            flex: 1;
+        }
+        
+        /* Diagrams */
+        .diagram {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .pipeline-stage {
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .pipeline-stage:hover {
+            transform: scale(1.05);
+        }
+        
+        .pipeline-arrow {
+            font-size: 2rem;
+            color: var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* Formula Box */
+        .formula {
+            background: linear-gradient(135deg, rgba(52,152,219,0.2), rgba(231,76,60,0.2));
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Interactive Elements */
+        .interactive-demo {
+            background: var(--code-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        input[type="range"] {
+            width: 200px;
+            accent-color: var(--secondary);
+        }
+        
+        .demo-output {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        
+        /* Sensor Visualization */
+        .sensor-viz {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .sensor-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            width: 180px;
+            transition: all 0.3s ease;
+        }
+        
+        .sensor-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-5px);
+        }
+        
+        .sensor-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .sensor-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .sensor-unit {
+            color: var(--light);
+            opacity: 0.7;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+        
+        .nav button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+        }
+        
+        /* Progress Bar */
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+        
+        /* Slide Counter */
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        /* Highlight Box */
+        .highlight {
+            background: linear-gradient(135deg, var(--accent), #c0392b);
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .info-box {
+            background: rgba(52,152,219,0.2);
+            border-left: 4px solid var(--secondary);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        th {
+            background: rgba(52,152,219,0.3);
+            color: var(--secondary);
+        }
+        
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .delay-3 { animation-delay: 0.6s; opacity: 0; }
+        .delay-4 { animation-delay: 0.8s; opacity: 0; }
+        
+        /* Chart Container */
+        .chart-container {
+            background: var(--code-bg);
+            border-radius: 15px;
+            padding: 20px;
+            height: 300px;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress" id="progress"></div>
+    
+    <div class="presentation" id="presentation">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide active" id="slide-1">
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+                <h1 class="fade-in">Algoritmi pentru IoT și<br>Stream Processing</h1>
+                <p class="fade-in delay-1" style="font-size:2rem;color:var(--secondary);">Săptămâna 19</p>
+                <p class="fade-in delay-2" style="margin-top:40px;opacity:0.7;">
+                    Algoritmi și Tehnici de Programare<br>
+                    ASE București - CSIE
+                </p>
+                <div class="fade-in delay-3" style="margin-top:60px;">
+                    <div class="sensor-viz">
+                        <div class="sensor-card">
+                            <div class="sensor-icon">🌡️</div>
+                            <div class="sensor-value" id="temp-val">22.5</div>
+                            <div class="sensor-unit">°C</div>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-icon">💧</div>
+                            <div class="sensor-value" id="humid-val">45</div>
+                            <div class="sensor-unit">%</div>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-icon">📊</div>
+                            <div class="sensor-value" id="data-val">1.2K</div>
+                            <div class="sensor-unit">msg/s</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Learning Objectives -->
+        <div class="slide" id="slide-2">
+            <h2>🎯 Obiective de Învățare</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Cunoaștere</h3>
+                    <ul class="fade-in">
+                        <li>Caracteristicile stream processing</li>
+                        <li>Diferențele batch vs stream</li>
+                        <li>Protocoalele IoT (MQTT, CoAP)</li>
+                    </ul>
+                    
+                    <h3>Aplicare</h3>
+                    <ul class="fade-in delay-1">
+                        <li>Implementare filtre (MA, EMA, Kalman)</li>
+                        <li>Detecție anomalii în timp real</li>
+                        <li>Procesare ferestre temporale</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Analiză</h3>
+                    <ul class="fade-in delay-2">
+                        <li>Trade-off-uri latență vs acuratețe</li>
+                        <li>Alegerea algoritmului potrivit</li>
+                        <li>Edge vs Cloud processing</li>
+                    </ul>
+                    
+                    <h3>Sinteză</h3>
+                    <ul class="fade-in delay-3">
+                        <li>Design pipeline-uri complete</li>
+                        <li>Sisteme tolerante la erori</li>
+                        <li>Optimizare pentru constrângeri IoT</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: What is Stream Processing? -->
+        <div class="slide" id="slide-3">
+            <h2>📊 Ce este Stream Processing?</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="info-box">
+                        <p><strong>Definiție:</strong> Procesarea datelor în timp real, pe măsură ce acestea sosesc, fără a le stoca complet în memorie.</p>
+                    </div>
+                    
+                    <h3>Caracteristici Cheie</h3>
+                    <ul>
+                        <li><strong>Single-pass:</strong> Fiecare element văzut o singură dată</li>
+                        <li><strong>O(1) memorie:</strong> Spațiu constant, independent de volum</li>
+                        <li><strong>Latență minimă:</strong> Rezultate imediate</li>
+                        <li><strong>Flux infinit:</strong> Nu știm când se termină</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <div class="diagram">
+                        <h3 style="text-align:center;margin-bottom:20px;">Batch vs Stream</h3>
+                        <table>
+                            <tr>
+                                <th>Batch</th>
+                                <th>Stream</th>
+                            </tr>
+                            <tr>
+                                <td>Date finite</td>
+                                <td>Date infinite</td>
+                            </tr>
+                            <tr>
+                                <td>Procesare completă</td>
+                                <td>Procesare incrementală</td>
+                            </tr>
+                            <tr>
+                                <td>Latență: minute-ore</td>
+                                <td>Latență: ms-secunde</td>
+                            </tr>
+                            <tr>
+                                <td>O(n) memorie</td>
+                                <td>O(1) memorie</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: IoT Pipeline -->
+        <div class="slide" id="slide-4">
+            <h2>🔄 Pipeline IoT Tipic</h2>
+            <div class="diagram">
+                <div class="pipeline">
+                    <div class="pipeline-stage">
+                        <div style="font-size:2rem;">📡</div>
+                        <div>Senzor</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div style="font-size:2rem;">🔧</div>
+                        <div>Filtrare</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div style="font-size:2rem;">📊</div>
+                        <div>Agregare</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div style="font-size:2rem;">🔍</div>
+                        <div>Detecție</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div style="font-size:2rem;">🚨</div>
+                        <div>Alertare</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="columns" style="margin-top:30px;">
+                <div class="column">
+                    <h3>Etape Detaliate</h3>
+                    <ul>
+                        <li><strong>Ingestie:</strong> Recepție date brute senzori</li>
+                        <li><strong>Filtrare:</strong> Reducere zgomot (MA, EMA, Kalman)</li>
+                        <li><strong>Agregare:</strong> Ferestre temporale (tumbling, sliding)</li>
+                        <li><strong>Detecție:</strong> Identificare anomalii (Z-score, IQR)</li>
+                        <li><strong>Acțiune:</strong> Alerte, actuatoare, logging</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <div class="highlight">
+                        <h3>💡 Principiu Cheie</h3>
+                        <p>Fiecare etapă trebuie să fie <strong>O(1)</strong> în memorie și timp per element pentru a scala la milioane de mesaje/secundă.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Moving Average Filter -->
+        <div class="slide" id="slide-5">
+            <h2>📈 Filtrul Moving Average</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="formula">
+                        MA<sub>n</sub> = (1/k) × Σ<sub>i=n-k+1</sub><sup>n</sup> x<sub>i</sub>
+                    </div>
+                    
+                    <h3>Implementare Eficientă O(1)</h3>
+                    <pre><code><span class="comment">// Actualizare incrementală</span>
+<span class="type">double</span> <span class="function">ma_update</span>(<span class="type">MAFilter</span>* f, <span class="type">double</span> new_val) {
+    <span class="comment">// Scoate valoarea veche din sumă</span>
+    f->sum -= f->buffer[f->index];
+    
+    <span class="comment">// Adaugă valoarea nouă</span>
+    f->buffer[f->index] = new_val;
+    f->sum += new_val;
+    
+    <span class="comment">// Avansează index circular</span>
+    f->index = (f->index + <span class="number">1</span>) % f->window_size;
+    
+    <span class="keyword">return</span> f->sum / f->window_size;
+}</code></pre>
+                </div>
+                <div class="column">
+                    <h3>Caracteristici</h3>
+                    <ul>
+                        <li>Memorie: O(k) pentru buffer circular</li>
+                        <li>Timp update: O(1) per element</li>
+                        <li>Întârziere: k/2 sample-uri</li>
+                        <li>Atenuare zgomot: √k</li>
+                    </ul>
+                    
+                    <div class="interactive-demo">
+                        <h3>🎮 Demo Interactiv</h3>
+                        <div class="demo-controls">
+                            <label>Window Size: <span id="ma-window-val">5</span></label>
+                            <input type="range" id="ma-window" min="2" max="20" value="5" onchange="updateMADemo()">
+                            <button onclick="generateMAData()">Generate Data</button>
+                        </div>
+                        <div class="demo-output" id="ma-output">
+                            Raw:      22.1, 23.5, 21.8, 24.2, 22.9
+                            Filtered: 22.1, 22.8, 22.5, 22.9, 22.9
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: EMA Filter -->
+        <div class="slide" id="slide-6">
+            <h2>📉 Filtrul Exponential Moving Average</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="formula">
+                        EMA<sub>n</sub> = α × x<sub>n</sub> + (1 - α) × EMA<sub>n-1</sub>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>α (smoothing factor):</strong> 0 &lt; α &lt; 1</p>
+                        <p>α mic → mai multă netezire, reacție lentă</p>
+                        <p>α mare → mai puțină netezire, reacție rapidă</p>
+                    </div>
+                    
+                    <h3>Avantaje față de MA</h3>
+                    <ul>
+                        <li>Memorie: O(1) - doar ultima valoare!</li>
+                        <li>Pondere exponențial descrescătoare</li>
+                        <li>Nu necesită buffer circular</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Implementare</h3>
+                    <pre><code><span class="keyword">typedef struct</span> {
+    <span class="type">double</span> alpha;
+    <span class="type">double</span> value;
+    <span class="type">bool</span> initialized;
+} <span class="type">EMAFilter</span>;
+
+<span class="type">double</span> <span class="function">ema_update</span>(<span class="type">EMAFilter</span>* f, <span class="type">double</span> x) {
+    <span class="keyword">if</span> (!f->initialized) {
+        f->value = x;
+        f->initialized = <span class="keyword">true</span>;
+    } <span class="keyword">else</span> {
+        f->value = f->alpha * x + 
+                   (<span class="number">1</span> - f->alpha) * f->value;
+    }
+    <span class="keyword">return</span> f->value;
+}</code></pre>
+                    
+                    <div class="highlight" style="margin-top:20px;">
+                        <p><strong>Regulă practică:</strong> α ≈ 2/(N+1) pentru echivalent cu MA de fereastră N</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Kalman Filter -->
+        <div class="slide" id="slide-7">
+            <h2>🎯 Filtrul Kalman (1D Simplificat)</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="info-box">
+                        <p><strong>Rudolf Kálmán (1930-2016)</strong></p>
+                        <p>Dezvoltat în 1960, folosit în navigația Apollo și GPS modern.</p>
+                    </div>
+                    
+                    <h3>Ciclul Predict-Update</h3>
+                    <div class="formula">
+                        <strong>Predict:</strong><br>
+                        x̂<sub>k|k-1</sub> = x̂<sub>k-1</sub><br>
+                        P<sub>k|k-1</sub> = P<sub>k-1</sub> + Q
+                    </div>
+                    <div class="formula">
+                        <strong>Update:</strong><br>
+                        K = P<sub>k|k-1</sub> / (P<sub>k|k-1</sub> + R)<br>
+                        x̂<sub>k</sub> = x̂<sub>k|k-1</sub> + K(z<sub>k</sub> - x̂<sub>k|k-1</sub>)<br>
+                        P<sub>k</sub> = (1 - K) × P<sub>k|k-1</sub>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3>Implementare</h3>
+                    <pre><code><span class="keyword">typedef struct</span> {
+    <span class="type">double</span> x;     <span class="comment">// Estimare</span>
+    <span class="type">double</span> P;     <span class="comment">// Incertitudine</span>
+    <span class="type">double</span> Q;     <span class="comment">// Zgomot proces</span>
+    <span class="type">double</span> R;     <span class="comment">// Zgomot măsurătoare</span>
+} <span class="type">Kalman1D</span>;
+
+<span class="type">double</span> <span class="function">kalman_update</span>(<span class="type">Kalman1D</span>* k, <span class="type">double</span> z) {
+    <span class="comment">// Predict</span>
+    <span class="type">double</span> P_pred = k->P + k->Q;
+    
+    <span class="comment">// Kalman Gain</span>
+    <span class="type">double</span> K = P_pred / (P_pred + k->R);
+    
+    <span class="comment">// Update</span>
+    k->x = k->x + K * (z - k->x);
+    k->P = (<span class="number">1</span> - K) * P_pred;
+    
+    <span class="keyword">return</span> k->x;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Anomaly Detection -->
+        <div class="slide" id="slide-8">
+            <h2>🔍 Detecție Anomalii</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Z-Score (Statistical)</h3>
+                    <div class="formula">
+                        Z = (x - μ) / σ
+                    </div>
+                    <p>Anomalie dacă |Z| > threshold (tipic 2.5-3.0)</p>
+                    
+                    <pre><code><span class="comment">// Algoritmul Welford pentru running stats</span>
+<span class="keyword">void</span> <span class="function">welford_update</span>(<span class="type">RunningStats</span>* s, <span class="type">double</span> x) {
+    s->count++;
+    <span class="type">double</span> delta = x - s->mean;
+    s->mean += delta / s->count;
+    <span class="type">double</span> delta2 = x - s->mean;
+    s->M2 += delta * delta2;
+}
+
+<span class="type">double</span> <span class="function">welford_stddev</span>(<span class="type">RunningStats</span>* s) {
+    <span class="keyword">return</span> <span class="function">sqrt</span>(s->M2 / s->count);
+}</code></pre>
+                </div>
+                <div class="column">
+                    <h3>IQR (Robust)</h3>
+                    <div class="formula">
+                        IQR = Q3 - Q1<br>
+                        Lower = Q1 - 1.5 × IQR<br>
+                        Upper = Q3 + 1.5 × IQR
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>Z-Score vs IQR</h3>
+                        <table>
+                            <tr><th>Z-Score</th><th>IQR</th></tr>
+                            <tr><td>Parametric</td><td>Non-parametric</td></tr>
+                            <tr><td>Sensibil la outliers</td><td>Robust</td></tr>
+                            <tr><td>O(1) update</td><td>O(k) buffer sortat</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Windowing -->
+        <div class="slide" id="slide-9">
+            <h2>🪟 Tipuri de Ferestre Temporale</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Tumbling Windows</h3>
+                    <div class="diagram" style="text-align:center;">
+                        <div style="display:flex;gap:10px;justify-content:center;">
+                            <div style="width:80px;height:60px;background:var(--secondary);border-radius:5px;display:flex;align-items:center;justify-content:center;">W1</div>
+                            <div style="width:80px;height:60px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;">W2</div>
+                            <div style="width:80px;height:60px;background:var(--success);border-radius:5px;display:flex;align-items:center;justify-content:center;">W3</div>
+                        </div>
+                        <p style="margin-top:10px;opacity:0.7;">Non-overlapping, fixed size</p>
+                    </div>
+                    <ul>
+                        <li>Ferestrele nu se suprapun</li>
+                        <li>Rezultat la finalul fiecărei ferestre</li>
+                        <li>Cel mai simplu de implementat</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Sliding Windows</h3>
+                    <div class="diagram" style="text-align:center;">
+                        <div style="position:relative;height:80px;">
+                            <div style="position:absolute;left:0;width:120px;height:50px;background:rgba(52,152,219,0.5);border-radius:5px;top:0;"></div>
+                            <div style="position:absolute;left:40px;width:120px;height:50px;background:rgba(231,76,60,0.5);border-radius:5px;top:15px;"></div>
+                            <div style="position:absolute;left:80px;width:120px;height:50px;background:rgba(39,174,96,0.5);border-radius:5px;top:30px;"></div>
+                        </div>
+                        <p style="margin-top:10px;opacity:0.7;">Overlapping windows</p>
+                    </div>
+                    <ul>
+                        <li>Ferestrele se suprapun</li>
+                        <li>Slide &lt; Window Size</li>
+                        <li>Mai multe rezultate, mai smooth</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3 style="margin-top:20px;">Session Windows</h3>
+            <p>Grupează evenimente bazat pe gap-ul între ele. Utile pentru sesiuni utilizator sau serii de evenimente corelate.</p>
+        </div>
+
+        <!-- Slide 10: MQTT Protocol -->
+        <div class="slide" id="slide-10">
+            <h2>📡 Protocolul MQTT</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="info-box">
+                        <p><strong>Message Queuing Telemetry Transport</strong></p>
+                        <p>Creat în 1999 de Andy Stanford-Clark (IBM) și Arlen Nipper pentru monitorizarea conductelor de petrol prin satelit.</p>
+                    </div>
+                    
+                    <h3>Caracteristici</h3>
+                    <ul>
+                        <li>Publish/Subscribe pattern</li>
+                        <li>Lightweight (2 bytes overhead minim)</li>
+                        <li>QoS niveluri: 0, 1, 2</li>
+                        <li>Retained messages</li>
+                        <li>Last Will and Testament (LWT)</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <div class="diagram">
+                        <div style="text-align:center;">
+                            <div style="display:inline-block;background:var(--secondary);padding:15px 30px;border-radius:10px;margin:10px;">Publisher</div>
+                            <div style="display:inline-block;background:var(--secondary);padding:15px 30px;border-radius:10px;margin:10px;">Publisher</div>
+                        </div>
+                        <div style="text-align:center;font-size:2rem;">↓ ↓</div>
+                        <div style="text-align:center;">
+                            <div style="display:inline-block;background:var(--accent);padding:25px 50px;border-radius:15px;margin:10px;font-size:1.3rem;">
+                                <strong>MQTT Broker</strong><br>
+                                (Mosquitto)
+                            </div>
+                        </div>
+                        <div style="text-align:center;font-size:2rem;">↓ ↓ ↓</div>
+                        <div style="text-align:center;">
+                            <div style="display:inline-block;background:var(--success);padding:15px 25px;border-radius:10px;margin:5px;">Sub 1</div>
+                            <div style="display:inline-block;background:var(--success);padding:15px 25px;border-radius:10px;margin:5px;">Sub 2</div>
+                            <div style="display:inline-block;background:var(--success);padding:15px 25px;border-radius:10px;margin:5px;">Sub 3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: QoS Levels -->
+        <div class="slide" id="slide-11">
+            <h2>📊 MQTT Quality of Service</h2>
+            <table>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Nume</th>
+                    <th>Garantie</th>
+                    <th>Overhead</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>QoS 0</strong></td>
+                    <td>At most once</td>
+                    <td>Fire & forget, posibile pierderi</td>
+                    <td>Minim</td>
+                    <td>Telemetrie frecventă</td>
+                </tr>
+                <tr>
+                    <td><strong>QoS 1</strong></td>
+                    <td>At least once</td>
+                    <td>Garantează livrare, posibile duplicate</td>
+                    <td>Mediu (ACK)</td>
+                    <td>Alerte, comenzi</td>
+                </tr>
+                <tr>
+                    <td><strong>QoS 2</strong></td>
+                    <td>Exactly once</td>
+                    <td>Garantează livrare unică</td>
+                    <td>Mare (4-way handshake)</td>
+                    <td>Tranzacții critice</td>
+                </tr>
+            </table>
+            
+            <div class="columns" style="margin-top:30px;">
+                <div class="column">
+                    <h3>Topic Wildcards</h3>
+                    <pre><code><span class="string">sensors/#</span>            <span class="comment">// Toate sub sensors/</span>
+<span class="string">sensors/+/temp</span>       <span class="comment">// Un nivel wildcard</span>
+<span class="string">home/+/+/status</span>      <span class="comment">// Multiple wildcards</span></code></pre>
+                </div>
+                <div class="column">
+                    <div class="highlight">
+                        <p><strong>Regulă:</strong> <code>+</code> = exact un nivel, <code>#</code> = zero sau mai multe (doar la final)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Rate Limiting -->
+        <div class="slide" id="slide-12">
+            <h2>⏱️ Rate Limiting pentru Alerte</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="info-box">
+                        <p><strong>Problema:</strong> Anomalii consecutive pot genera flood de alerte.</p>
+                        <p><strong>Soluția:</strong> Limitare număr alerte per interval de timp.</p>
+                    </div>
+                    
+                    <h3>Implementare cu Sliding Window</h3>
+                    <pre><code><span class="keyword">typedef struct</span> {
+    <span class="type">uint64_t</span>* timestamps;
+    <span class="type">int</span> capacity;
+    <span class="type">int</span> head;
+    <span class="type">int</span> count;
+    <span class="type">uint64_t</span> window_ms;
+} <span class="type">RateLimiter</span>;
+
+<span class="type">bool</span> <span class="function">rate_limit_check</span>(<span class="type">RateLimiter</span>* r) {
+    <span class="type">uint64_t</span> now = <span class="function">get_time_ms</span>();
+    <span class="type">uint64_t</span> cutoff = now - r->window_ms;
+    
+    <span class="comment">// Elimină timestamps expirate</span>
+    <span class="keyword">while</span> (r->count > <span class="number">0</span> && 
+           r->timestamps[oldest] < cutoff) {
+        r->count--;
+    }
+    
+    <span class="keyword">return</span> r->count < r->capacity;
+}</code></pre>
+                </div>
+                <div class="column">
+                    <h3>Strategii</h3>
+                    <ul>
+                        <li><strong>Fixed window:</strong> Max N alerte per minut</li>
+                        <li><strong>Sliding window:</strong> Max N în ultimele 60s</li>
+                        <li><strong>Token bucket:</strong> Rate mediu cu bursts</li>
+                        <li><strong>Cooldown:</strong> Pauză fixă după alertă</li>
+                    </ul>
+                    
+                    <div class="diagram">
+                        <h3>Exemplu</h3>
+                        <p>Max 3 alerte/minut cu 30s cooldown:</p>
+                        <div style="font-family:monospace;background:rgba(0,0,0,0.3);padding:15px;border-radius:8px;">
+                            T=0s:  ✅ Alert #1<br>
+                            T=10s: ❌ Suppressed (cooldown)<br>
+                            T=35s: ✅ Alert #2<br>
+                            T=40s: ❌ Suppressed (cooldown)<br>
+                            T=70s: ✅ Alert #3<br>
+                            T=80s: ❌ Suppressed (limit reached)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Edge vs Cloud -->
+        <div class="slide" id="slide-13">
+            <h2>☁️ Edge vs Cloud Processing</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Edge Computing</h3>
+                    <div class="sensor-card" style="width:100%;text-align:left;">
+                        <p>✅ Latență minimă (ms)</p>
+                        <p>✅ Funcționare offline</p>
+                        <p>✅ Confidențialitate date</p>
+                        <p>✅ Bandă redusă</p>
+                        <p>❌ Resurse limitate</p>
+                        <p>❌ Management distribuit</p>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3>Cloud Computing</h3>
+                    <div class="sensor-card" style="width:100%;text-align:left;">
+                        <p>✅ Resurse nelimitate</p>
+                        <p>✅ Analize complexe (ML)</p>
+                        <p>✅ Stocare istorică</p>
+                        <p>✅ Management centralizat</p>
+                        <p>❌ Latență (100ms+)</p>
+                        <p>❌ Dependență de rețea</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="highlight" style="margin-top:30px;">
+                <h3>💡 Abordare Hibridă</h3>
+                <p><strong>Edge:</strong> Filtrare, agregare, detecție rapidă, acțiuni imediate</p>
+                <p><strong>Cloud:</strong> Stocare, analize ML, dashboard-uri, configurare</p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Summary -->
+        <div class="slide" id="slide-14">
+            <h2>📝 Sumar</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Concepte Cheie</h3>
+                    <ul>
+                        <li>Stream processing = O(1) memorie, single-pass</li>
+                        <li>Pipeline: Ingestie → Filtrare → Agregare → Detecție</li>
+                        <li>MQTT = protocol lightweight pub/sub</li>
+                    </ul>
+                    
+                    <h3>Algoritmi</h3>
+                    <ul>
+                        <li><strong>MA:</strong> Buffer circular, întârziere k/2</li>
+                        <li><strong>EMA:</strong> O(1) memorie, α controlează netezire</li>
+                        <li><strong>Kalman:</strong> Optimal pentru zgomot Gaussian</li>
+                        <li><strong>Z-score:</strong> Anomalii statistice (Welford)</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Exerciții Săptămâna Aceasta</h3>
+                    <div class="info-box">
+                        <p><strong>Exercise 1:</strong> Smart Building Monitor</p>
+                        <p>10 senzori temperatură, EMA α=0.2, tumbling windows 5 min</p>
+                    </div>
+                    <div class="info-box">
+                        <p><strong>Exercise 2:</strong> Anomaly Detector</p>
+                        <p>Z-score threshold 2.5, rate limiting 3/min, Welford stats</p>
+                    </div>
+                    
+                    <div class="highlight">
+                        <p><strong>Comandă:</strong></p>
+                        <pre style="margin:0;"><code>make all && make test</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: References -->
+        <div class="slide" id="slide-15">
+            <h2>📚 Bibliografie și Resurse</h2>
+            <div class="columns">
+                <div class="column">
+                    <h3>Cărți</h3>
+                    <ul style="font-size:1.2rem;">
+                        <li>Kleppmann, M. (2017). <em>Designing Data-Intensive Applications</em></li>
+                        <li>Greengard, S. (2021). <em>The Internet of Things</em></li>
+                        <li>Welch, G. & Bishop, G. (2006). <em>An Introduction to the Kalman Filter</em></li>
+                    </ul>
+                    
+                    <h3>Persoane Importante</h3>
+                    <ul style="font-size:1.2rem;">
+                        <li><strong>Rudolf Kálmán</strong> (1930-2016) - Filtrul Kalman</li>
+                        <li><strong>Kevin Ashton</strong> (1968-) - Termenul "IoT"</li>
+                        <li><strong>Andy Stanford-Clark</strong> - Co-creator MQTT</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Resurse Online</h3>
+                    <ul style="font-size:1.2rem;">
+                        <li><a href="https://mqtt.org/" style="color:var(--secondary);">mqtt.org</a> - Specificația oficială</li>
+                        <li><a href="https://mosquitto.org/" style="color:var(--secondary);">mosquitto.org</a> - Broker open-source</li>
+                        <li><a href="https://www.eclipse.org/paho/" style="color:var(--secondary);">Eclipse Paho</a> - Biblioteci MQTT</li>
+                    </ul>
+                    
+                    <h3>Comenzi Utile</h3>
+                    <pre><code><span class="comment"># Pornire broker</span>
+docker-compose up -d mosquitto
+
+<span class="comment"># Test subscriber</span>
+mosquitto_sub -t "sensors/#" -v
+
+<span class="comment"># Test publisher</span>
+mosquitto_pub -t "sensors/temp" -m "22.5"</code></pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav">
+        <button onclick="prevSlide()">←</button>
+        <button onclick="nextSlide()">→</button>
+    </div>
+    
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">15</span>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 15;
+        
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(s => s.classList.remove('active'));
+            
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide;
+            document.getElementById('progress').style.width = `${(currentSlide / totalSlides) * 100}%`;
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+        
+        function prevSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'Home') { currentSlide = 1; showSlide(1); }
+            if (e.key === 'End') { currentSlide = totalSlides; showSlide(totalSlides); }
+        });
+        
+        // Touch navigation
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+        
+        // Animate sensor values on title slide
+        function animateSensors() {
+            const temp = document.getElementById('temp-val');
+            const humid = document.getElementById('humid-val');
+            const data = document.getElementById('data-val');
+            
+            if (temp) temp.textContent = (20 + Math.random() * 5).toFixed(1);
+            if (humid) humid.textContent = Math.floor(40 + Math.random() * 20);
+            if (data) data.textContent = (1 + Math.random() * 0.5).toFixed(1) + 'K';
+        }
+        setInterval(animateSensors, 2000);
+        
+        // MA Demo
+        function updateMADemo() {
+            const val = document.getElementById('ma-window').value;
+            document.getElementById('ma-window-val').textContent = val;
+        }
+        
+        function generateMAData() {
+            const windowSize = parseInt(document.getElementById('ma-window').value);
+            const raw = [];
+            const filtered = [];
+            let sum = 0;
+            const buffer = [];
+            
+            for (let i = 0; i < 8; i++) {
+                const val = 22 + (Math.random() - 0.5) * 4;
+                raw.push(val.toFixed(1));
+                
+                buffer.push(val);
+                if (buffer.length > windowSize) buffer.shift();
+                
+                const avg = buffer.reduce((a, b) => a + b, 0) / buffer.length;
+                filtered.push(avg.toFixed(1));
+            }
+            
+            document.getElementById('ma-output').textContent = 
+                `Raw:      ${raw.join(', ')}\nFiltered: ${filtered.join(', ')}`;
+        }
+        
+        // Initialize
+        showSlide(1);
+    </script>
+</body>
+</html>

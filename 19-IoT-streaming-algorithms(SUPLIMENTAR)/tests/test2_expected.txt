@@ -1,0 +1,3 @@
+# Output așteptat pentru Exercise 2
+# Detectare anomalie la T=21000 cu Z-score > 2.5
+# Rate limiting activ pentru alerte consecutive

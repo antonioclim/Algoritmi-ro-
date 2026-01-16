@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparație Filtre: MA vs EMA vs Kalman</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --ma-color: #58a6ff;
+            --ema-color: #f78166;
+            --kalman-color: #7ee787;
+            --raw-color: #8b949e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--ma-color), var(--ema-color), var(--kalman-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card.ma h2 { color: var(--ma-color); }
+        .card.ema h2 { color: var(--ema-color); }
+        .card.kalman h2 { color: var(--kalman-color); }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+        
+        .badge.ma { background: rgba(88,166,255,0.2); color: var(--ma-color); }
+        .badge.ema { background: rgba(247,129,102,0.2); color: var(--ema-color); }
+        .badge.kalman { background: rgba(126,231,135,0.2); color: var(--kalman-color); }
+        
+        /* Formula */
+        .formula {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat {
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        /* Interactive Section */
+        .interactive {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        input[type="range"] {
+            width: 150px;
+            accent-color: var(--ma-color);
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px;
+            border-radius: 6px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--ma-color), var(--ema-color));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        
+        /* Canvas */
+        .chart-container {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 350px;
+        }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        .legend-color.raw { background: var(--raw-color); }
+        .legend-color.ma { background: var(--ma-color); }
+        .legend-color.ema { background: var(--ema-color); }
+        .legend-color.kalman { background: var(--kalman-color); }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .comparison-table th {
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .check { color: var(--kalman-color); }
+        .cross { color: var(--ema-color); }
+        
+        /* Metrics Display */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .metric-values {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .metric-value {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metric-value span:first-child {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .metric-value span:last-child {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        
+        /* Code Block */
+        pre {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .keyword { color: #ff7b72; }
+        .type { color: #ffa657; }
+        .function { color: #d2a8ff; }
+        .number { color: #79c0ff; }
+        .comment { color: #8b949e; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comparație Filtre de Netezire</h1>
+        <p class="subtitle">Moving Average vs Exponential MA vs Kalman 1D</p>
+        
+        <!-- Filter Cards -->
+        <div class="grid">
+            <!-- MA Card -->
+            <div class="card ma">
+                <h2>
+                    📊 Moving Average
+                    <span class="badge ma">O(k) memorie</span>
+                </h2>
+                <div class="formula">
+                    MA<sub>n</sub> = (1/k) × Σ x<sub>i</sub>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Memorie</div>
+                        <div class="stat-value">O(k)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Update</div>
+                        <div class="stat-value">O(1)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Întârziere</div>
+                        <div class="stat-value">k/2</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Parametri</div>
+                        <div class="stat-value">k (window)</div>
+                    </div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.9rem;">
+                    Pondere egală pentru toate valorile din fereastră.
+                    Simplu dar introduce întârziere (lag).
+                </p>
+            </div>
+            
+            <!-- EMA Card -->
+            <div class="card ema">
+                <h2>
+                    📈 Exponential MA
+                    <span class="badge ema">O(1) memorie</span>
+                </h2>
+                <div class="formula">
+                    EMA<sub>n</sub> = α·x<sub>n</sub> + (1-α)·EMA<sub>n-1</sub>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Memorie</div>
+                        <div class="stat-value">O(1)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Update</div>
+                        <div class="stat-value">O(1)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Întârziere</div>
+                        <div class="stat-value">~1/α</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Parametri</div>
+                        <div class="stat-value">α (0-1)</div>
+                    </div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.9rem;">
+                    Pondere exponențială - valorile recente contează mai mult.
+                    Memorie minimă, reacție configurabilă.
+                </p>
+            </div>
+            
+            <!-- Kalman Card -->
+            <div class="card kalman">
+                <h2>
+                    🎯 Kalman Filter
+                    <span class="badge kalman">Adaptiv</span>
+                </h2>
+                <div class="formula">
+                    K = P / (P + R), x̂ = x̂ + K(z - x̂)
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Memorie</div>
+                        <div class="stat-value">O(1)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Update</div>
+                        <div class="stat-value">O(1)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Întârziere</div>
+                        <div class="stat-value">Adaptivă</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Parametri</div>
+                        <div class="stat-value">Q, R</div>
+                    </div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.9rem;">
+                    Optimal pentru zgomot Gaussian. Gain adaptiv bazat pe
+                    raportul Q/R (proces vs măsurătoare).
+                </p>
+            </div>
+        </div>
+        
+        <!-- Interactive Demo -->
+        <div class="interactive">
+            <h2 style="margin-bottom:20px;">🎮 Demo Interactiv</h2>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label>MA Window Size (k)</label>
+                    <input type="range" id="ma-window" min="2" max="20" value="5" oninput="updateParams()">
+                    <span id="ma-window-val">5</span>
+                </div>
+                
+                <div class="control-group">
+                    <label>EMA Alpha (α)</label>
+                    <input type="range" id="ema-alpha" min="5" max="95" value="30" oninput="updateParams()">
+                    <span id="ema-alpha-val">0.30</span>
+                </div>
+                
+                <div class="control-group">
+                    <label>Kalman Q (process noise)</label>
+                    <input type="range" id="kalman-q" min="1" max="100" value="10" oninput="updateParams()">
+                    <span id="kalman-q-val">0.10</span>
+                </div>
+                
+                <div class="control-group">
+                    <label>Kalman R (measurement noise)</label>
+                    <input type="range" id="kalman-r" min="1" max="100" value="50" oninput="updateParams()">
+                    <span id="kalman-r-val">0.50</span>
+                </div>
+                
+                <div class="control-group">
+                    <label>Noise Level</label>
+                    <input type="range" id="noise" min="0" max="100" value="30" oninput="updateParams()">
+                    <span id="noise-val">30%</span>
+                </div>
+                
+                <button onclick="generateData()">🔄 Generate New Data</button>
+                <button onclick="addAnomaly()">⚡ Add Anomaly</button>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color raw"></div>
+                    <span>Raw Signal</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color ma"></div>
+                    <span>Moving Average</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color ema"></div>
+                    <span>Exponential MA</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color kalman"></div>
+                    <span>Kalman Filter</span>
+                </div>
+            </div>
+            
+            <!-- Metrics -->
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-title">MSE (vs True Signal)</div>
+                    <div class="metric-values">
+                        <div class="metric-value" style="color:var(--ma-color)">
+                            <span id="mse-ma">0.00</span>
+                            <span>MA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--ema-color)">
+                            <span id="mse-ema">0.00</span>
+                            <span>EMA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--kalman-color)">
+                            <span id="mse-kalman">0.00</span>
+                            <span>Kalman</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title">Lag (samples)</div>
+                    <div class="metric-values">
+                        <div class="metric-value" style="color:var(--ma-color)">
+                            <span id="lag-ma">2.5</span>
+                            <span>MA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--ema-color)">
+                            <span id="lag-ema">3.3</span>
+                            <span>EMA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--kalman-color)">
+                            <span id="lag-kalman">~</span>
+                            <span>Kalman</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title">Smoothness</div>
+                    <div class="metric-values">
+                        <div class="metric-value" style="color:var(--ma-color)">
+                            <span id="smooth-ma">0.00</span>
+                            <span>MA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--ema-color)">
+                            <span id="smooth-ema">0.00</span>
+                            <span>EMA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--kalman-color)">
+                            <span id="smooth-kalman">0.00</span>
+                            <span>Kalman</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title">Response Time</div>
+                    <div class="metric-values">
+                        <div class="metric-value" style="color:var(--ma-color)">
+                            <span id="resp-ma">5</span>
+                            <span>MA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--ema-color)">
+                            <span id="resp-ema">3</span>
+                            <span>EMA</span>
+                        </div>
+                        <div class="metric-value" style="color:var(--kalman-color)">
+                            <span id="resp-kalman">2</span>
+                            <span>Kalman</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <div class="card">
+            <h2 style="margin-bottom:20px;">📋 Comparație Detaliată</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Criteriu</th>
+                        <th style="color:var(--ma-color)">Moving Average</th>
+                        <th style="color:var(--ema-color)">Exponential MA</th>
+                        <th style="color:var(--kalman-color)">Kalman Filter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Complexitate memorie</td>
+                        <td>O(k) - buffer circular</td>
+                        <td>O(1) - doar last value</td>
+                        <td>O(1) - x, P, Q, R</td>
+                    </tr>
+                    <tr>
+                        <td>Complexitate timp</td>
+                        <td>O(1) amortizat</td>
+                        <td>O(1)</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>Pondere valori</td>
+                        <td>Egală în fereastră</td>
+                        <td>Exponențial descrescătoare</td>
+                        <td>Adaptivă (Kalman gain)</td>
+                    </tr>
+                    <tr>
+                        <td>Parametri de tunat</td>
+                        <td>k (window size)</td>
+                        <td>α (smoothing factor)</td>
+                        <td>Q, R (varianțe zgomot)</td>
+                    </tr>
+                    <tr>
+                        <td>Adaptiv la schimbări</td>
+                        <td class="cross">✗ Lent (lag = k/2)</td>
+                        <td>Mediu (depinde de α)</td>
+                        <td class="check">✓ Adaptiv automat</td>
+                    </tr>
+                    <tr>
+                        <td>Optimal pentru</td>
+                        <td>Semnal staționar, zgomot uniform</td>
+                        <td>Trend tracking, resurse limitate</td>
+                        <td>Zgomot Gaussian, semnal dinamic</td>
+                    </tr>
+                    <tr>
+                        <td>Ușurință implementare</td>
+                        <td class="check">✓ Foarte simplu</td>
+                        <td class="check">✓ Simplu</td>
+                        <td>Moderat</td>
+                    </tr>
+                    <tr>
+                        <td>Use case IoT</td>
+                        <td>Telemetrie low-rate</td>
+                        <td>Edge devices, trending</td>
+                        <td>Tracking precis, fuziune senzori</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Code Examples -->
+        <div class="grid" style="margin-top:20px;">
+            <div class="card">
+                <h2 style="color:var(--ma-color);margin-bottom:15px;">MA - Cod C</h2>
+                <pre><code><span class="type">double</span> <span class="function">ma_update</span>(<span class="type">MAFilter</span>* f, <span class="type">double</span> x) {
+    f->sum -= f->buffer[f->idx];
+    f->buffer[f->idx] = x;
+    f->sum += x;
+    f->idx = (f->idx + <span class="number">1</span>) % f->k;
+    <span class="keyword">return</span> f->sum / f->k;
+}</code></pre>
+            </div>
+            
+            <div class="card">
+                <h2 style="color:var(--ema-color);margin-bottom:15px;">EMA - Cod C</h2>
+                <pre><code><span class="type">double</span> <span class="function">ema_update</span>(<span class="type">EMAFilter</span>* f, <span class="type">double</span> x) {
+    <span class="keyword">if</span> (!f->init) {
+        f->value = x;
+        f->init = <span class="keyword">true</span>;
+    } <span class="keyword">else</span> {
+        f->value = f->alpha * x + 
+                   (<span class="number">1</span>-f->alpha) * f->value;
+    }
+    <span class="keyword">return</span> f->value;
+}</code></pre>
+            </div>
+            
+            <div class="card">
+                <h2 style="color:var(--kalman-color);margin-bottom:15px;">Kalman - Cod C</h2>
+                <pre><code><span class="type">double</span> <span class="function">kalman_update</span>(<span class="type">Kalman1D</span>* k, <span class="type">double</span> z) {
+    <span class="type">double</span> P_pred = k->P + k->Q;
+    <span class="type">double</span> K = P_pred / (P_pred + k->R);
+    k->x = k->x + K * (z - k->x);
+    k->P = (<span class="number">1</span> - K) * P_pred;
+    <span class="keyword">return</span> k->x;
+}</code></pre>
+            </div>
+        </div>
+        
+        <!-- Recommendations -->
+        <div class="card" style="margin-top:20px;">
+            <h2 style="margin-bottom:20px;">💡 Recomandări de Utilizare</h2>
+            <div class="grid">
+                <div>
+                    <h3 style="color:var(--ma-color);">Folosește MA când:</h3>
+                    <ul style="margin-left:20px;color:var(--text-muted);">
+                        <li>Semnalul este relativ stabil</li>
+                        <li>Latența nu este critică</li>
+                        <li>Vrei implementare simplă</li>
+                        <li>Zgomot uniform în fereastră</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color:var(--ema-color);">Folosește EMA când:</h3>
+                    <ul style="margin-left:20px;color:var(--text-muted);">
+                        <li>Memoria este limitată (IoT)</li>
+                        <li>Urmărești trend-uri</li>
+                        <li>Vrei reacție rapidă la schimbări</li>
+                        <li>Valorile recente contează mai mult</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color:var(--kalman-color);">Folosește Kalman când:</h3>
+                    <ul style="margin-left:20px;color:var(--text-muted);">
+                        <li>Zgomot Gaussian (sau aproape)</li>
+                        <li>Ai model dinamic al sistemului</li>
+                        <li>Vrei comportament adaptiv</li>
+                        <li>Precizia este critică</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let rawData = [];
+        let trueSignal = [];
+        let maData = [];
+        let emaData = [];
+        let kalmanData = [];
+        
+        // Parameters
+        let params = {
+            maWindow: 5,
+            emaAlpha: 0.3,
+            kalmanQ: 0.1,
+            kalmanR: 0.5,
+            noiseLevel: 0.3
+        };
+        
+        // Canvas setup
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width - 30;
+            canvas.height = 350;
+        }
+        
+        // Filter implementations
+        class MovingAverage {
+            constructor(windowSize) {
+                this.windowSize = windowSize;
+                this.buffer = [];
+                this.sum = 0;
+            }
+            
+            update(value) {
+                this.buffer.push(value);
+                this.sum += value;
+                
+                if (this.buffer.length > this.windowSize) {
+                    this.sum -= this.buffer.shift();
+                }
+                
+                return this.sum / this.buffer.length;
+            }
+            
+            reset() {
+                this.buffer = [];
+                this.sum = 0;
+            }
+        }
+        
+        class ExponentialMA {
+            constructor(alpha) {
+                this.alpha = alpha;
+                this.value = null;
+            }
+            
+            update(x) {
+                if (this.value === null) {
+                    this.value = x;
+                } else {
+                    this.value = this.alpha * x + (1 - this.alpha) * this.value;
+                }
+                return this.value;
+            }
+            
+            reset() {
+                this.value = null;
+            }
+        }
+        
+        class Kalman1D {
+            constructor(q, r, initialValue = 0) {
+                this.q = q;  // Process noise
+                this.r = r;  // Measurement noise
+                this.x = initialValue;  // Estimate
+                this.p = 1.0;  // Uncertainty
+            }
+            
+            update(z) {
+                // Predict
+                const pPred = this.p + this.q;
+                
+                // Update
+                const k = pPred / (pPred + this.r);
+                this.x = this.x + k * (z - this.x);
+                this.p = (1 - k) * pPred;
+                
+                return this.x;
+            }
+            
+            reset() {
+                this.x = 0;
+                this.p = 1.0;
+            }
+        }
+        
+        // Generate signal
+        function generateSignal(n = 100) {
+            trueSignal = [];
+            rawData = [];
+            
+            for (let i = 0; i < n; i++) {
+                // True signal: sine wave with trend
+                const t = i / n;
+                const sine = Math.sin(t * 4 * Math.PI) * 3;
+                const trend = t * 2;
+                const trueVal = 22 + sine + trend;
+                trueSignal.push(trueVal);
+                
+                // Add Gaussian noise
+                const noise = gaussianRandom() * params.noiseLevel * 3;
+                rawData.push(trueVal + noise);
+            }
+        }
+        
+        function gaussianRandom() {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const ma = new MovingAverage(params.maWindow);
+            const ema = new ExponentialMA(params.emaAlpha);
+            const kalman = new Kalman1D(params.kalmanQ, params.kalmanR, rawData[0]);
+            
+            maData = [];
+            emaData = [];
+            kalmanData = [];
+            
+            for (let i = 0; i < rawData.length; i++) {
+                maData.push(ma.update(rawData[i]));
+                emaData.push(ema.update(rawData[i]));
+                kalmanData.push(kalman.update(rawData[i]));
+            }
+        }
+        
+        // Calculate metrics
+        function calculateMetrics() {
+            // MSE
+            const mseMa = mse(maData, trueSignal);
+            const mseEma = mse(emaData, trueSignal);
+            const mseKalman = mse(kalmanData, trueSignal);
+            
+            document.getElementById('mse-ma').textContent = mseMa.toFixed(3);
+            document.getElementById('mse-ema').textContent = mseEma.toFixed(3);
+            document.getElementById('mse-kalman').textContent = mseKalman.toFixed(3);
+            
+            // Lag
+            document.getElementById('lag-ma').textContent = (params.maWindow / 2).toFixed(1);
+            document.getElementById('lag-ema').textContent = (1 / params.emaAlpha).toFixed(1);
+            document.getElementById('lag-kalman').textContent = 'adaptive';
+            
+            // Smoothness (variance of first derivative)
+            const smoothMa = smoothness(maData);
+            const smoothEma = smoothness(emaData);
+            const smoothKalman = smoothness(kalmanData);
+            
+            document.getElementById('smooth-ma').textContent = smoothMa.toFixed(2);
+            document.getElementById('smooth-ema').textContent = smoothEma.toFixed(2);
+            document.getElementById('smooth-kalman').textContent = smoothKalman.toFixed(2);
+            
+            // Response time (simplified)
+            document.getElementById('resp-ma').textContent = params.maWindow;
+            document.getElementById('resp-ema').textContent = Math.ceil(3 / params.emaAlpha);
+            document.getElementById('resp-kalman').textContent = Math.ceil(2 * params.kalmanR / (params.kalmanQ + 0.1));
+        }
+        
+        function mse(filtered, true_signal) {
+            let sum = 0;
+            for (let i = 0; i < filtered.length; i++) {
+                sum += Math.pow(filtered[i] - true_signal[i], 2);
+            }
+            return sum / filtered.length;
+        }
+        
+        function smoothness(data) {
+            let sumSq = 0;
+            for (let i = 1; i < data.length; i++) {
+                sumSq += Math.pow(data[i] - data[i-1], 2);
+            }
+            return Math.sqrt(sumSq / (data.length - 1));
+        }
+        
+        // Draw chart
+        function drawChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+            const width = canvas.width - padding.left - padding.right;
+            const height = canvas.height - padding.top - padding.bottom;
+            
+            // Find data range
+            const allData = [...rawData, ...maData, ...emaData, ...kalmanData];
+            const minVal = Math.min(...allData) - 1;
+            const maxVal = Math.max(...allData) + 1;
+            
+            // Scale functions
+            const xScale = (i) => padding.left + (i / (rawData.length - 1)) * width;
+            const yScale = (v) => padding.top + height - ((v - minVal) / (maxVal - minVal)) * height;
+            
+            // Draw grid
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * height;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(canvas.width - padding.right, y);
+                ctx.stroke();
+                
+                // Y-axis labels
+                const val = maxVal - (i / 5) * (maxVal - minVal);
+                ctx.fillStyle = '#8b949e';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(val.toFixed(1), padding.left - 5, y + 4);
+            }
+            
+            // Draw lines
+            function drawLine(data, color, lineWidth = 2) {
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                
+                for (let i = 0; i < data.length; i++) {
+                    const x = xScale(i);
+                    const y = yScale(data[i]);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+            
+            // Draw in order: raw (back), then filters
+            drawLine(rawData, '#8b949e', 1);
+            drawLine(maData, '#58a6ff', 2);
+            drawLine(emaData, '#f78166', 2);
+            drawLine(kalmanData, '#7ee787', 2);
+        }
+        
+        // Update parameters
+        function updateParams() {
+            params.maWindow = parseInt(document.getElementById('ma-window').value);
+            params.emaAlpha = parseInt(document.getElementById('ema-alpha').value) / 100;
+            params.kalmanQ = parseInt(document.getElementById('kalman-q').value) / 100;
+            params.kalmanR = parseInt(document.getElementById('kalman-r').value) / 100;
+            params.noiseLevel = parseInt(document.getElementById('noise').value) / 100;
+            
+            document.getElementById('ma-window-val').textContent = params.maWindow;
+            document.getElementById('ema-alpha-val').textContent = params.emaAlpha.toFixed(2);
+            document.getElementById('kalman-q-val').textContent = params.kalmanQ.toFixed(2);
+            document.getElementById('kalman-r-val').textContent = params.kalmanR.toFixed(2);
+            document.getElementById('noise-val').textContent = Math.round(params.noiseLevel * 100) + '%';
+            
+            applyFilters();
+            calculateMetrics();
+            drawChart();
+        }
+        
+        // Generate new data
+        function generateData() {
+            generateSignal(100);
+            applyFilters();
+            calculateMetrics();
+            drawChart();
+        }
+        
+        // Add anomaly
+        function addAnomaly() {
+            const idx = Math.floor(rawData.length * 0.6);
+            rawData[idx] = rawData[idx] + 10;
+            applyFilters();
+            calculateMetrics();
+            drawChart();
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            generateData();
+        });
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawChart();
+        });
+    </script>
+</body>
+</html>
